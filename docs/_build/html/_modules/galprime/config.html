@@ -40,6 +40,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../galprime.html">GalPRIME Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../galprime.plotting.html">GalPRIME Plotting Methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../subdocs/running_galprime.html">Running GalPrime</a></li>
 </ul>
 
         </div>
@@ -294,16 +295,12 @@
 
 
 <div class="viewcode-block" id="dump_default_config_file_koe"><a class="viewcode-back" href="../../galprime.html#galprime.config.dump_default_config_file_koe">[docs]</a><span class="k">def</span> <span class="nf">dump_default_config_file_koe</span><span class="p">(</span><span class="n">directory</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Dumps a default configuration file with all necessary parameters for using the KOE extraction pipeline.</span>
-<span class="sd">    Args:</span>
-<span class="sd">        directory: Directory to write file to. OPTIONAL.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;# Set verbosity printouts. VERBOSE: General printouts. TEST_MODE: Only extract 10 profiles as a check .&quot;</span><span class="p">,</span>
-             <span class="s2">&quot;VERBOSE             = True&quot;</span><span class="p">,</span>
-             <span class="s2">&quot;TEST_MODE        = False&quot;</span><span class="p">,</span>
-             <span class="s2">&quot;&quot;</span><span class="p">,</span>
-             <span class="s2">&quot;# Directories and filenames -- Input and output&quot;</span><span class="p">,</span>
+
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;# Set verbosity printouts. VERBOSE: General printouts. TEST_MODE: Only extract 10 profiles as a check .&quot;</span><span class="p">,</span> 
+        <span class="s2">&quot;VERBOSE             = True&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TEST_MODE        = False&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;# Directories and filenames -- Input and output&quot;</span><span class="p">,</span>
              <span class="s2">&quot;CATALOG             = cat.fits&quot;</span><span class="p">,</span>
              <span class="s2">&quot;IMAGE_DIRECTORY     = images/&quot;</span><span class="p">,</span>
              <span class="s2">&quot;OUT_DIR             = out/&quot;</span><span class="p">,</span>

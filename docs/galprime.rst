@@ -35,13 +35,6 @@ Data Handling (data)
    :undoc-members:
    :exclude-members: random, choice, randint, uniform
 
-Determining Cutout Density (densities)
------------------------------------------------
-
-.. automodule:: galprime.densities
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 1D Surface Brightness Profile Extraction (extraction)
 --------------------------------------------------------------

@@ -104,7 +104,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#galprime.data.to_sb"><code class="docutils literal notranslate"><span class="pre">to_sb()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#determining-cutout-density-densities">Determining Cutout Density (densities)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-galprime.extraction">1D Surface Brightness Profile Extraction (extraction)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#galprime.extraction.isophote_fitting"><code class="docutils literal notranslate"><span class="pre">isophote_fitting()</span></code></a></li>
 </ul>
@@ -358,7 +357,6 @@ If none, plt.show() is run instead</p></li>
 <span id="configuring-galprime-config"></span><h2>Configuring GalPRIME (config)<a class="headerlink" href="#module-galprime.config" title="Permalink to this heading"></a></h2>
 <p>Configuration settings methods.</p>
 <p>This module contains all methods required to properly set up or read a configuration file for use with TBriDGE.</p>
-<p>subdocs/running_galprime</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="galprime.config.config_to_file">
 <span class="sig-name descname"><span class="pre">config_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config_out.galprime'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/config.html#config_to_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.config.config_to_file" title="Permalink to this definition"></a></dt>
@@ -401,12 +399,7 @@ If none, plt.show() is run instead</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="galprime.config.dump_default_config_file_koe">
 <span class="sig-name descname"><span class="pre">dump_default_config_file_koe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/config.html#dump_default_config_file_koe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.config.dump_default_config_file_koe" title="Permalink to this definition"></a></dt>
-<dd><p>Dumps a default configuration file with all necessary parameters for using the KOE extraction pipeline.
-Args:</p>
-<blockquote>
-<div><p>directory: Directory to write file to. OPTIONAL.</p>
-</div></blockquote>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="galprime.config.load_config_file">
@@ -454,7 +447,8 @@ loading in properly.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="galprime.data.CutoutList">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CutoutList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cutouts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutout_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/data.html#CutoutList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.data.CutoutList" title="Permalink to this definition"></a></dt>
-<dd><dl class="py method">
+<dd><p>Class to contain both the data and associated metadata for a set of cutouts.</p>
+<dl class="py method">
 <dt class="sig sig-object py" id="galprime.data.CutoutList.cutouts_to_file">
 <span class="sig-name descname"><span class="pre">cutouts_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cutouts.fits'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/data.html#CutoutList.cutouts_to_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.data.CutoutList.cutouts_to_file" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -636,28 +630,31 @@ is found. If none found, raises a ValueError</p>
 <dd></dd></dl>
 
 </section>
-<section id="determining-cutout-density-densities">
-<h2>Determining Cutout Density (densities)<a class="headerlink" href="#determining-cutout-density-densities" title="Permalink to this heading"></a></h2>
-</section>
 <section id="module-galprime.extraction">
 <span id="d-surface-brightness-profile-extraction-extraction"></span><h2>1D Surface Brightness Profile Extraction (extraction)<a class="headerlink" href="#module-galprime.extraction" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="galprime.extraction.isophote_fitting">
 <span class="sig-name descname"><span class="pre">isophote_fitting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">centre_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/extraction.html#isophote_fitting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.extraction.isophote_fitting" title="Permalink to this definition"></a></dt>
-<dd><p>Wrapper for photutils.isophote methods</p>
-<p>Generates a table of results from isophote fitting analysis. This uses photutils Isophote procedure, which is
-effectively IRAF’s Ellipse() method.
-Iterates over many possible input ellipses to force a higher success rate.</p>
-<dl>
-<dt>Args:</dt><dd><p>data: The input cutout
-config: The configuration parameters, which contains details like STEP and LINEAR for profile extraction.
-centre_method: Which method to use to determine where to place the centre of the first ellipse.</p>
-<blockquote>
-<div><p>‘standard’: place at the exact centre of the cutout
-‘max’: place at the maximum pixel in the cutout</p>
-</div></blockquote>
+<dd><dl class="simple">
+<dt>Wrapper for the photutils isophote extraction routine. Designed to get the most out of profile </dt><dd><p>extractions.</p>
 </dd>
-<dt>Returns:</dt><dd><p>The table of results, or an empty list if not fitted successfully.</p>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>numpy.ndarray</em>) – Input data (2D cutout)</p></li>
+<li><p><strong>config</strong> (<em>dict</em><em>, </em><em>optional</em>) – The configuration file with isophote fitting params. Will use default parameters if 
+nothing is supplied, defaults to None</p></li>
+<li><p><strong>centre_method</strong> (<em>str</em><em>, </em><em>optional</em>) – Which method to use when finding the centre for initial isophote, defaults to ‘standard’
+‘standard’  Uses the central region of the cutout
+‘max’       Uses the location of the brightest pixel. Only use if your cutout is properly masked.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The photutils isophotelist object containing extraction results.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>photutils.isophote.IsophoteList</p>
 </dd>
 </dl>
 </dd></dl>

@@ -40,6 +40,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../galprime.html">GalPRIME Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../galprime.plotting.html">GalPRIME Plotting Methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../subdocs/running_galprime.html">Running GalPrime</a></li>
 </ul>
 
         </div>
@@ -74,32 +75,26 @@
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
 
-
 <div class="viewcode-block" id="isophote_fitting"><a class="viewcode-back" href="../../galprime.html#galprime.extraction.isophote_fitting">[docs]</a><span class="k">def</span> <span class="nf">isophote_fitting</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">centre_method</span><span class="o">=</span><span class="s1">&#39;standard&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Wrapper for photutils.isophote methods</span>
+    <span class="sd">&quot;&quot;&quot; Wrapper for the photutils isophote extraction routine. Designed to get the most out of profile </span>
+<span class="sd">        extractions.</span>
 
-<span class="sd">    Generates a table of results from isophote fitting analysis. This uses photutils Isophote procedure, which is</span>
-<span class="sd">    effectively IRAF&#39;s Ellipse() method.</span>
-<span class="sd">    Iterates over many possible input ellipses to force a higher success rate.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        data: The input cutout</span>
-<span class="sd">        config: The configuration parameters, which contains details like STEP and LINEAR for profile extraction.</span>
-<span class="sd">        centre_method: Which method to use to determine where to place the centre of the first ellipse.</span>
-<span class="sd">            &#39;standard&#39;: place at the exact centre of the cutout</span>
-<span class="sd">            &#39;max&#39;: place at the maximum pixel in the cutout</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        The table of results, or an empty list if not fitted successfully.</span>
-
+<span class="sd">    :param data: Input data (2D cutout)</span>
+<span class="sd">    :type data: numpy.ndarray</span>
+<span class="sd">    :param config: The configuration file with isophote fitting params. Will use default parameters if </span>
+<span class="sd">        nothing is supplied, defaults to None</span>
+<span class="sd">    :type config: dict, optional</span>
+<span class="sd">    :param centre_method: Which method to use when finding the centre for initial isophote, defaults to &#39;standard&#39;</span>
+<span class="sd">        &#39;standard&#39;  Uses the central region of the cutout</span>
+<span class="sd">        &#39;max&#39;       Uses the location of the brightest pixel. Only use if your cutout is properly masked.</span>
+<span class="sd">    :type centre_method: str, optional</span>
+<span class="sd">    :return: The photutils isophotelist object containing extraction results.</span>
+<span class="sd">    :rtype: photutils.isophote.IsophoteList</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Set-up failsafe in case of strange infinte loops in photutils</span>
-    <span class="c1"># warnings.filterwarnings(&quot;error&quot;)</span>
 
     <span class="n">fail_count</span><span class="p">,</span> <span class="n">max_fails</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span>
     <span class="n">linear</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;LINEAR&quot;</span><span class="p">]</span>
     <span class="n">step</span> <span class="o">=</span> <span class="mf">1.</span> <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;LINEAR_STEP&quot;</span><span class="p">]</span>
-    <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;VERBOSE&quot;</span><span class="p">]</span>
 
     <span class="c1"># Get centre of image and cutout halfwidth</span>
     <span class="k">if</span> <span class="n">centre_method</span> <span class="o">==</span> <span class="s1">&#39;standard&#39;</span><span class="p">:</span>
