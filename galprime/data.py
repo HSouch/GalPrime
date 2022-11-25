@@ -17,6 +17,8 @@ from tqdm import tqdm
 
 
 class CutoutList:
+    """Class to contain both the data and associated metadata for a set of cutouts.
+    """
     
     def __init__(self, cutouts=None, cutout_data=[], metadata={}):
         if cutouts is None:

@@ -225,16 +225,12 @@ def config_to_file(config, filename="config_out.galprime"):
 
 
 def dump_default_config_file_koe(directory=""):
-    """
-    Dumps a default configuration file with all necessary parameters for using the KOE extraction pipeline.
-    Args:
-        directory: Directory to write file to. OPTIONAL.
-    """
-    lines = ["# Set verbosity printouts. VERBOSE: General printouts. TEST_MODE: Only extract 10 profiles as a check .",
-             "VERBOSE             = True",
-             "TEST_MODE        = False",
-             "",
-             "# Directories and filenames -- Input and output",
+
+    lines = ["# Set verbosity printouts. VERBOSE: General printouts. TEST_MODE: Only extract 10 profiles as a check .", 
+        "VERBOSE             = True",
+        "TEST_MODE        = False",
+        "",
+        "# Directories and filenames -- Input and output",
              "CATALOG             = cat.fits",
              "IMAGE_DIRECTORY     = images/",
              "OUT_DIR             = out/",

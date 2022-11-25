@@ -5,32 +5,26 @@ from photutils import data_properties
 from tqdm import tqdm
 
 
-
 def isophote_fitting(data, config=None, centre_method='standard'):
-    """ Wrapper for photutils.isophote methods
+    """ Wrapper for the photutils isophote extraction routine. Designed to get the most out of profile 
+        extractions.
 
-    Generates a table of results from isophote fitting analysis. This uses photutils Isophote procedure, which is
-    effectively IRAF's Ellipse() method.
-    Iterates over many possible input ellipses to force a higher success rate.
-
-    Args:
-        data: The input cutout
-        config: The configuration parameters, which contains details like STEP and LINEAR for profile extraction.
-        centre_method: Which method to use to determine where to place the centre of the first ellipse.
-            'standard': place at the exact centre of the cutout
-            'max': place at the maximum pixel in the cutout
-
-    Returns:
-        The table of results, or an empty list if not fitted successfully.
-
+    :param data: Input data (2D cutout)
+    :type data: numpy.ndarray
+    :param config: The configuration file with isophote fitting params. Will use default parameters if 
+        nothing is supplied, defaults to None
+    :type config: dict, optional
+    :param centre_method: Which method to use when finding the centre for initial isophote, defaults to 'standard'
+        'standard'  Uses the central region of the cutout
+        'max'       Uses the location of the brightest pixel. Only use if your cutout is properly masked.
+    :type centre_method: str, optional
+    :return: The photutils isophotelist object containing extraction results.
+    :rtype: photutils.isophote.IsophoteList
     """
-    # Set-up failsafe in case of strange infinte loops in photutils
-    # warnings.filterwarnings("error")
 
     fail_count, max_fails = 0, 1000
     linear = False if config is None else config["LINEAR"]
     step = 1. if config is None else config["LINEAR_STEP"]
-    verbose = False if config is None else config["VERBOSE"]
 
     # Get centre of image and cutout halfwidth
     if centre_method == 'standard':
