@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>galprime.data &mdash; GalPRIME  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> GalPRIME
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../galprime.html">GalPRIME Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../galprime.plotting.html">GalPRIME Plotting Methods</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GalPRIME</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">galprime.data</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for galprime.data</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot; Classes and methods for handling astronomical data &quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
+<span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Table</span>
+<span class="kn">from</span> <span class="nn">astropy</span> <span class="kn">import</span> <span class="n">wcs</span>
+<span class="kn">from</span> <span class="nn">astropy.nddata</span> <span class="kn">import</span> <span class="n">Cutout2D</span>
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">galprime</span>
+
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+
+<div class="viewcode-block" id="CutoutList"><a class="viewcode-back" href="../../galprime.html#galprime.data.CutoutList">[docs]</a><span class="k">class</span> <span class="nc">CutoutList</span><span class="p">:</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cutouts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cutout_data</span><span class="o">=</span><span class="p">[],</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="k">if</span> <span class="n">cutouts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cutouts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">metadata</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="p">{}</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">cutouts</span> <span class="o">=</span> <span class="n">cutouts</span>              <span class="c1"># List to hold cutouts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cutout_data</span> <span class="o">=</span> <span class="n">cutout_data</span>      <span class="c1"># This is the container for associated data to each cutout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span>            <span class="c1"># Any extra needed metadata</span>
+    
+        <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;N_CUTOUTS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cutouts</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="CutoutList.update_medatada"><a class="viewcode-back" href="../../galprime.html#galprime.data.CutoutList.update_medatada">[docs]</a>    <span class="k">def</span> <span class="nf">update_medatada</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;N_CUTOUTS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutouts</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="CutoutList.cutouts_to_file"><a class="viewcode-back" href="../../galprime.html#galprime.data.CutoutList.cutouts_to_file">[docs]</a>    <span class="k">def</span> <span class="nf">cutouts_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;cutouts.fits&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutouts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">out_hdulist</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">HDUList</span><span class="p">()</span>
+        <span class="n">head</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">Header</span><span class="p">()</span>
+        
+        <span class="c1"># Add the metadata (if any) to the header</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">:</span>
+            <span class="n">head</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+
+        <span class="c1"># Now add the individual cutouts to the HDUList with associated data in the individual headers</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cutout</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutouts</span><span class="p">):</span>
+            <span class="n">this_head</span> <span class="o">=</span> <span class="n">head</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">this_head</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutout_data</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="n">out_hdulist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fits</span><span class="o">.</span><span class="n">ImageHDU</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">cutout</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">this_head</span><span class="p">))</span>
+        
+        <span class="n">out_hdulist</span><span class="o">.</span><span class="n">writeto</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">)</span></div></div>
+
+
+
+<span class="k">def</span> <span class="nf">get_image_filenames</span><span class="p">(</span><span class="n">images_directory</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Retrieves a list of all available filenames for a given directory, and a given band.</span>
+
+<span class="sd">    :param images_directory: The top-level directory from which to get image filenames from.</span>
+<span class="sd">    :type images_directory: str</span>
+<span class="sd">    :param image_band: The image band, defaults to &quot;i&quot;</span>
+<span class="sd">    :type image_band: str, optional</span>
+<span class="sd">    :param check_band: Check to make sure the images are of a certain band, defaults to False.</span>
+<span class="sd">        WARNING: Optimized for HSC filename format (ex: HSC-I_9813_4c3.fits).</span>
+<span class="sd">    :type check_band: bool, optional</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">image_filenames</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">images_directory</span><span class="p">)</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s1">&#39;*.fits&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">images</span><span class="p">:</span>
+        <span class="n">image_filenames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">image_filenames</span>
+
+
+<div class="viewcode-block" id="get_closest_psf"><a class="viewcode-back" href="../../galprime.html#galprime.data.get_closest_psf">[docs]</a><span class="k">def</span> <span class="nf">get_closest_psf</span><span class="p">(</span><span class="n">psfs</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">ra_key</span><span class="o">=</span><span class="s2">&quot;RA&quot;</span><span class="p">,</span> <span class="n">dec_key</span><span class="o">=</span><span class="s2">&quot;DEC&quot;</span><span class="p">):</span>
+    <span class="n">ras</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">psfs</span><span class="o">.</span><span class="n">cutout_data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;RA&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">psfs</span><span class="o">.</span><span class="n">cutout_data</span><span class="p">))])</span>
+    <span class="n">decs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">psfs</span><span class="o">.</span><span class="n">cutout_data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;DEC&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">psfs</span><span class="o">.</span><span class="n">cutout_data</span><span class="p">))])</span>
+    
+    <span class="n">closest</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(((</span><span class="n">ras</span> <span class="o">-</span> <span class="n">ra</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">decs</span> <span class="o">-</span> <span class="n">dec</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+        
+    <span class="k">return</span> <span class="n">psfs</span><span class="o">.</span><span class="n">cutouts</span><span class="p">[</span><span class="n">closest</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="get_wcs"><a class="viewcode-back" href="../../galprime.html#galprime.data.get_wcs">[docs]</a><span class="k">def</span> <span class="nf">get_wcs</span><span class="p">(</span><span class="n">fits_filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds and returns the WCS for an image. If Primary Header WCS no good, searches each index until a good one</span>
+<span class="sd">        is found. If none found, raises a ValueError</span>
+
+<span class="sd">        :param fits_filename: The filename for the FITS file.</span>
+<span class="sd">        :type fits_filename: str</span>
+<span class="sd">        :return: The WCS object.</span>
+<span class="sd">        :raises: ValueError</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Try just opening the initial header</span>
+    <span class="n">wcs_init</span> <span class="o">=</span> <span class="n">wcs</span><span class="o">.</span><span class="n">WCS</span><span class="p">(</span><span class="n">fits_filename</span><span class="p">)</span>
+    <span class="n">ra</span><span class="p">,</span> <span class="n">dec</span> <span class="o">=</span> <span class="n">wcs_init</span><span class="o">.</span><span class="n">axis_type_names</span>
+    <span class="k">if</span> <span class="n">ra</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;RA&quot;</span> <span class="ow">and</span> <span class="n">dec</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;DEC&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">wcs_init</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">hdu_list</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fits_filename</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">hdu_list</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">wcs_slice</span> <span class="o">=</span> <span class="n">wcs</span><span class="o">.</span><span class="n">WCS</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
+                <span class="n">ra</span><span class="p">,</span> <span class="n">dec</span> <span class="o">=</span> <span class="n">wcs_slice</span><span class="o">.</span><span class="n">axis_type_names</span>
+                <span class="k">if</span> <span class="n">ra</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;RA&quot;</span> <span class="ow">and</span> <span class="n">dec</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;DEC&quot;</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">wcs_slice</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">continue</span>
+        <span class="n">hdu_list</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">raise</span> <span class="ne">ValueError</span></div>
+
+
+<div class="viewcode-block" id="gen_backgrounds"><a class="viewcode-back" href="../../galprime.html#galprime.data.gen_backgrounds">[docs]</a><span class="k">def</span> <span class="nf">gen_backgrounds</span><span class="p">(</span><span class="n">image_directory</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">n_cutouts</span> <span class="o">=</span> <span class="mi">10</span> <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;N_BACKGROUNDS&quot;</span><span class="p">]</span>
+    
+    <span class="n">image_files</span> <span class="o">=</span> <span class="n">get_image_filenames</span><span class="p">(</span><span class="n">image_directory</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">image_directory</span><span class="p">,</span> <span class="n">image_files</span><span class="p">,</span> <span class="n">n_cutouts</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_angular_size_dist"><a class="viewcode-back" href="../../galprime.html#galprime.data.get_angular_size_dist">[docs]</a><span class="k">def</span> <span class="nf">get_angular_size_dist</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">H0</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">WM</span><span class="o">=</span><span class="mf">0.27</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the angular size distance in Megaparsecs.</span>
+<span class="sd">    (Stripped down version of Cosmocalc by Ned Wright and Tom Aldcroft (aldcroft@head.cfa.harvard.edu))</span>
+
+<span class="sd">    :param z: The redshift.</span>
+<span class="sd">    :type z: float</span>
+<span class="sd">    :param H0: The Hubble constant, defaults to 71 km/s/Mpc</span>
+<span class="sd">    :type H0: float, optional</span>
+<span class="sd">    :param WM: matter density parameter, defaults to 0.27</span>
+<span class="sd">    :type WM: float, optional</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="mf">299792.458</span>  <span class="c1"># velocity of light in km/sec</span>
+
+        <span class="k">if</span> <span class="n">z</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">:</span>
+            <span class="n">z</span> <span class="o">/=</span> <span class="mf">299792.458</span>  <span class="c1"># Values over 100 are in km/s</span>
+
+        <span class="n">WV</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">WM</span> <span class="o">-</span> <span class="mf">0.4165</span> <span class="o">/</span> <span class="p">(</span><span class="n">H0</span> <span class="o">*</span> <span class="n">H0</span><span class="p">)</span>  <span class="c1"># Omega(vacuum) or lambda</span>
+        <span class="n">age</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># age of Universe in units of 1/H0</span>
+
+        <span class="n">h</span> <span class="o">=</span> <span class="n">H0</span> <span class="o">/</span> <span class="mf">100.</span>
+        <span class="n">WR</span> <span class="o">=</span> <span class="mf">4.165E-5</span> <span class="o">/</span> <span class="p">(</span><span class="n">h</span> <span class="o">*</span> <span class="n">h</span><span class="p">)</span>  <span class="c1"># includes 3 massless neutrino species, T0 = 2.72528</span>
+        <span class="n">WK</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">WM</span> <span class="o">-</span> <span class="n">WR</span> <span class="o">-</span> <span class="n">WV</span>
+        <span class="n">az</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">z</span><span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">1000</span>  <span class="c1"># number of points in integrals</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">az</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span>
+            <span class="n">adot</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">WK</span> <span class="o">+</span> <span class="p">(</span><span class="n">WM</span> <span class="o">/</span> <span class="n">a</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">WR</span> <span class="o">/</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">a</span><span class="p">))</span> <span class="o">+</span> <span class="p">(</span><span class="n">WV</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="n">a</span><span class="p">))</span>
+            <span class="n">age</span> <span class="o">+=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">adot</span>
+
+        <span class="n">DCMR</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="c1"># do integral over a=1/(1+z) from az to 1 in n steps, midpoint rule</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">az</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">az</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span>
+            <span class="n">adot</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">WK</span> <span class="o">+</span> <span class="p">(</span><span class="n">WM</span> <span class="o">/</span> <span class="n">a</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">WR</span> <span class="o">/</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">a</span><span class="p">))</span> <span class="o">+</span> <span class="p">(</span><span class="n">WV</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="n">a</span><span class="p">))</span>
+            <span class="n">DCMR</span> <span class="o">=</span> <span class="n">DCMR</span> <span class="o">+</span> <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">adot</span><span class="p">)</span>
+
+        <span class="n">DCMR</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">az</span><span class="p">)</span> <span class="o">*</span> <span class="n">DCMR</span> <span class="o">/</span> <span class="n">n</span>
+
+        <span class="c1"># tangential comoving distance</span>
+        <span class="n">ratio</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">WK</span><span class="p">))</span> <span class="o">*</span> <span class="n">DCMR</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mf">0.1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">WK</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">ratio</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">))</span> <span class="o">/</span> <span class="n">x</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ratio</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="n">x</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span>
+            <span class="k">if</span> <span class="n">WK</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="o">-</span><span class="n">y</span>
+            <span class="n">ratio</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">+</span> <span class="n">y</span> <span class="o">/</span> <span class="mf">6.</span> <span class="o">+</span> <span class="n">y</span> <span class="o">*</span> <span class="n">y</span> <span class="o">/</span> <span class="mf">120.</span>
+        <span class="n">DCMT</span> <span class="o">=</span> <span class="n">ratio</span> <span class="o">*</span> <span class="n">DCMR</span>
+        <span class="n">DA</span> <span class="o">=</span> <span class="n">az</span> <span class="o">*</span> <span class="n">DCMT</span>
+        <span class="n">Mpc</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">c</span> <span class="o">/</span> <span class="n">H0</span> <span class="o">*</span> <span class="n">x</span>
+        <span class="n">DA_Mpc</span> <span class="o">=</span> <span class="n">Mpc</span><span class="p">(</span><span class="n">DA</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">DA_Mpc</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span></div>
+
+
+<div class="viewcode-block" id="get_image_filenames"><a class="viewcode-back" href="../../galprime.html#galprime.data.get_image_filenames">[docs]</a><span class="k">def</span> <span class="nf">get_image_filenames</span><span class="p">(</span><span class="n">images_directory</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Retrieves a list of all available filenames for a given directory, and a given band.</span>
+
+<span class="sd">    :param images_directory: The top-level directory from which to get image filenames from.</span>
+<span class="sd">    :type images_directory: str</span>
+<span class="sd">    :param image_band: The image band, defaults to &quot;i&quot;</span>
+<span class="sd">    :type image_band: str, optional</span>
+<span class="sd">    :param check_band: Check to make sure the images are of a certain band, defaults to False.</span>
+<span class="sd">        WARNING: Optimized for HSC filename format (ex: HSC-I_9813_4c3.fits).</span>
+<span class="sd">    :type check_band: bool, optional</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">image_filenames</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">images_directory</span><span class="p">)</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s1">&#39;*.fits&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">images</span><span class="p">:</span>
+        <span class="n">image_filenames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">image_filenames</span></div>
+
+
+<div class="viewcode-block" id="gen_cutouts"><a class="viewcode-back" href="../../galprime.html#galprime.data.gen_cutouts">[docs]</a><span class="k">def</span> <span class="nf">gen_cutouts</span><span class="p">(</span><span class="n">image_directory</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">n_cutouts</span> <span class="o">=</span> <span class="mi">10</span> <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;N_BACKGROUNDS&quot;</span><span class="p">]</span>
+    <span class="n">cutout_size</span> <span class="o">=</span> <span class="mi">71</span> <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;SIZE&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">cutout_size</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">cutout_size</span> <span class="o">+=</span> <span class="mi">1</span> 
+    
+    <span class="n">hw</span> <span class="o">=</span> <span class="n">cutout_size</span> <span class="o">/</span> <span class="mi">2</span>
+    
+    <span class="n">image_files</span> <span class="o">=</span> <span class="n">get_image_filenames</span><span class="p">(</span><span class="n">image_directory</span><span class="p">)</span>
+    
+    <span class="n">cutouts</span><span class="p">,</span> <span class="n">cutout_data</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="n">iterator</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_cutouts</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Making Image Cutouts: &quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">progress_bar</span> <span class="k">else</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_cutouts</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">:</span>
+        <span class="n">this_fn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">image_files</span><span class="p">)</span>
+        
+        <span class="k">with</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">this_fn</span><span class="p">)</span> <span class="k">as</span> <span class="n">HDUList</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">HDUList</span><span class="p">)):</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">HDUList</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+                    <span class="n">this_wcs</span> <span class="o">=</span> <span class="n">wcs</span><span class="o">.</span><span class="n">WCS</span><span class="p">(</span><span class="n">HDUList</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
+                    <span class="k">break</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">hw</span> <span class="o">+</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">hw</span> <span class="o">-</span> <span class="n">buffer</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">hw</span> <span class="o">+</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">hw</span> <span class="o">-</span> <span class="n">buffer</span><span class="p">)</span>
+        <span class="n">ra</span><span class="p">,</span> <span class="n">dec</span> <span class="o">=</span> <span class="n">this_wcs</span><span class="o">.</span><span class="n">wcs_pix2world</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">cutout</span> <span class="o">=</span> <span class="n">Cutout2D</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="n">cutout_size</span><span class="p">,</span> <span class="n">wcs</span><span class="o">=</span><span class="n">this_wcs</span><span class="p">)</span>
+        
+        <span class="n">cutouts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cutout</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        
+        <span class="n">cutout_data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;IMG&quot;</span><span class="p">:</span><span class="n">this_fn</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">:</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">:</span><span class="n">y</span><span class="p">,</span> <span class="s2">&quot;RA&quot;</span><span class="p">:</span><span class="nb">float</span><span class="p">(</span><span class="n">ra</span><span class="p">),</span> <span class="s2">&quot;DEC&quot;</span><span class="p">:</span><span class="nb">float</span><span class="p">(</span><span class="n">dec</span><span class="p">)</span> <span class="p">})</span>
+    
+    <span class="k">return</span> <span class="n">CutoutList</span><span class="p">(</span><span class="n">cutouts</span><span class="o">=</span><span class="n">cutouts</span><span class="p">,</span> <span class="n">cutout_data</span><span class="o">=</span><span class="n">cutout_data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="cutouts_from_file"><a class="viewcode-back" href="../../galprime.html#galprime.data.cutouts_from_file">[docs]</a><span class="k">def</span> <span class="nf">cutouts_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="n">cutouts</span><span class="p">,</span> <span class="n">cutout_datasets</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">HDUList</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">hdu</span> <span class="ow">in</span> <span class="n">HDUList</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">cutout</span><span class="p">,</span> <span class="n">cutout_data</span> <span class="o">=</span> <span class="n">hdu</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">hdu</span><span class="o">.</span><span class="n">header</span>
+                <span class="n">cutouts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cutout</span><span class="p">)</span>
+                <span class="n">cutout_datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cutout_data</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">continue</span>
+        
+    <span class="k">return</span> <span class="n">CutoutList</span><span class="p">(</span><span class="n">cutouts</span><span class="o">=</span><span class="n">cutouts</span><span class="p">,</span> <span class="n">cutout_data</span><span class="o">=</span><span class="n">cutout_datasets</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ordered_dict"><a class="viewcode-back" href="../../galprime.html#galprime.data.ordered_dict">[docs]</a><span class="k">def</span> <span class="nf">ordered_dict</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="n">out_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
+        <span class="n">out_dict</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">out_dict</span></div>
+
+
+<div class="viewcode-block" id="dict_extend"><a class="viewcode-back" href="../../galprime.html#galprime.data.dict_extend">[docs]</a><span class="k">def</span> <span class="nf">dict_extend</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="s2">&quot;_1&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Adds an extension onto the dict keys for a given input dictionary.</span>
+<span class="sd">    Helpful when needing to add multiple dicts to a given metadata file</span>
+
+<span class="sd">    :param d: An input dictionary</span>
+<span class="sd">    :type d: dict</span>
+<span class="sd">    :param extension: The extension to add to each key, defaults to &quot;_1&quot;</span>
+<span class="sd">    :type extension: str, optional</span>
+<span class="sd">    :return: Dictionary with added extensions onto each key</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d_new</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
+        <span class="n">d_new</span><span class="p">[</span><span class="n">n</span> <span class="o">+</span> <span class="n">extension</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">d_new</span></div>
+
+
+<div class="viewcode-block" id="good_isolist_names"><a class="viewcode-back" href="../../galprime.html#galprime.data.good_isolist_names">[docs]</a><span class="k">def</span> <span class="nf">good_isolist_names</span><span class="p">():</span>
+     <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;sma&#39;</span><span class="p">,</span> <span class="s1">&#39;intens&#39;</span><span class="p">,</span> <span class="s1">&#39;intens_err&#39;</span><span class="p">,</span> <span class="s1">&#39;ellipticity&#39;</span><span class="p">,</span> <span class="s1">&#39;ellipticity_err&#39;</span><span class="p">,</span> 
+              <span class="s1">&#39;pa&#39;</span><span class="p">,</span> <span class="s1">&#39;pa_err&#39;</span><span class="p">,</span> <span class="s1">&#39;x0&#39;</span><span class="p">,</span> <span class="s1">&#39;x0_err&#39;</span><span class="p">,</span> <span class="s1">&#39;y0&#39;</span><span class="p">,</span> <span class="s1">&#39;y0_err&#39;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="table_from_isolist"><a class="viewcode-back" href="../../galprime.html#galprime.data.table_from_isolist">[docs]</a><span class="k">def</span> <span class="nf">table_from_isolist</span><span class="p">(</span><span class="n">isolist</span><span class="p">,</span> <span class="n">hdu</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Generates an astropy table</span>
+
+<span class="sd">    :param isolist: The photutils.isophote.isophotelist object </span>
+<span class="sd">    :type isolist: photutils.isophote.isophotelist</span>
+<span class="sd">    :param names: Column names, defaults to galprime.good_isolist_names()</span>
+<span class="sd">    :type names: list, optional</span>
+<span class="sd">    :return: The table generated from the isolist</span>
+<span class="sd">    :rtype: astropy.table.Table</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="n">good_isolist_names</span><span class="p">()</span>
+    <span class="n">isolist_t</span> <span class="o">=</span> <span class="n">isolist</span><span class="o">.</span><span class="n">to_table</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">Table</span><span class="p">([</span><span class="n">isolist_t</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">names</span><span class="p">],</span>  <span class="n">names</span><span class="o">=</span><span class="n">names</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="gen_out_prefix"><a class="viewcode-back" href="../../galprime.html#galprime.data.gen_out_prefix">[docs]</a><span class="k">def</span> <span class="nf">gen_out_prefix</span><span class="p">(</span><span class="n">bin_params</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generates a custom string based on the bin params</span>
+
+<span class="sd">    :param bin_params: _description_</span>
+<span class="sd">    :type bin_params: _type_</span>
+<span class="sd">    :return: _description_</span>
+<span class="sd">    :rtype: _type_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;bin_&quot;</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bin_params</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)):</span>
+        <span class="n">prefix</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">bin_params</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">bin_params</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span>
+
+    <span class="k">return</span> <span class="n">prefix</span></div>
+
+
+<div class="viewcode-block" id="gen_index_prefix"><a class="viewcode-back" href="../../galprime.html#galprime.data.gen_index_prefix">[docs]</a><span class="k">def</span> <span class="nf">gen_index_prefix</span><span class="p">(</span><span class="n">bin_params</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Go through the available bin parameters and generate a docstring that corresponds with</span>
+<span class="sd">    an index-adjusted version of the other prefix (easier for plotting).</span>
+
+<span class="sd">    :param bin_params: _description_</span>
+<span class="sd">    :type bin_params: _type_</span>
+<span class="sd">    :param config: _description_</span>
+<span class="sd">    :type config: _type_</span>
+<span class="sd">    :return: _description_</span>
+<span class="sd">    :rtype: _type_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bin_params</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)):</span>
+        <span class="n">param</span> <span class="o">=</span> <span class="n">bin_params</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="n">check</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;BIN_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)])</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">check</span> <span class="o">-</span> <span class="n">param</span><span class="p">)</span>
+        <span class="n">prefix</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">delta</span><span class="p">)))</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span>    
+    <span class="k">return</span> <span class="n">prefix</span></div>
+
+
+<div class="viewcode-block" id="gen_filestructure"><a class="viewcode-back" href="../../galprime.html#galprime.data.gen_filestructure">[docs]</a><span class="k">def</span> <span class="nf">gen_filestructure</span><span class="p">(</span><span class="n">outdir</span><span class="p">):</span>
+
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;bare_profiles/&quot;</span><span class="p">,</span> <span class="s2">&quot;bgadded_profiles/&quot;</span><span class="p">,</span> <span class="s2">&quot;bgsub_profiles/&quot;</span><span class="p">,</span> <span class="s2">&quot;additional_info/&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;bare_medians/&quot;</span><span class="p">,</span> <span class="s2">&quot;bgadded_medians/&quot;</span><span class="p">,</span> <span class="s2">&quot;bgsub_medians/&quot;</span><span class="p">]:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">outdir</span> <span class="o">+</span> <span class="n">d</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="to_sb"><a class="viewcode-back" href="../../galprime.html#galprime.data.to_sb">[docs]</a><span class="k">def</span> <span class="nf">to_sb</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">m_0</span><span class="o">=</span><span class="mi">27</span><span class="p">,</span> <span class="n">arcconv</span><span class="o">=</span><span class="mf">0.168</span><span class="p">):</span>
+    <span class="n">y_new</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">y</span> <span class="o">/</span> <span class="p">(</span><span class="n">arcconv</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">+</span> <span class="n">m_0</span>
+    <span class="k">return</span> <span class="n">y_new</span></div>
+
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Harrison Souchereau.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

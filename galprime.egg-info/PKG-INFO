@@ -1,0 +1,28 @@
+Metadata-Version: 2.1
+Name: galprime
+Version: 2.0.3
+Summary: Simulation suite for efficiency testing of galaxy surface brightness profiles.
+Home-page: https://github.com/HSouch/GalPRIME
+Author: Harrison Souchereau
+Author-email: harrison.souchereau@yale.edu
+License: BSD-3-Clause
+Keywords: galaxies surface brightness profiles
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Build Tools
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# GalPRIME
+
+***GAL***axy ***P***rofile ***R***ecovery from ***I***mages of ***M***odel ***E***mission
+
+Galprime is a testing suite for images and catalogues of astronomical information, 
+using differences between the extracted profiles of a model galaxy and that same model 
+added to various backgrounds. 
+
+It is designed to work with any catalogue of structural parameters, as well as any set 
+of input images.

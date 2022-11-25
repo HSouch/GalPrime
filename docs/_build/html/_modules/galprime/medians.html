@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>galprime.medians &mdash; GalPRIME  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> GalPRIME
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../galprime.html">GalPRIME Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../galprime.plotting.html">GalPRIME Plotting Methods</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GalPRIME</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">galprime.medians</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for galprime.medians</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">interp1d</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Table</span>
+
+
+<div class="viewcode-block" id="max_sma"><a class="viewcode-back" href="../../galprime.html#galprime.medians.max_sma">[docs]</a><span class="k">def</span> <span class="nf">max_sma</span><span class="p">(</span><span class="n">table_list</span><span class="p">,</span> <span class="n">sma_key</span><span class="o">=</span><span class="s2">&quot;sma&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the maximum semimajor axis for a table list</span>
+
+<span class="sd">    :param table_list: _description_</span>
+<span class="sd">    :type table_list: _type_</span>
+<span class="sd">    :param sma_key: _description_, defaults to &quot;sma&quot;</span>
+<span class="sd">    :type sma_key: str, optional</span>
+<span class="sd">    :return: _description_</span>
+<span class="sd">    :rtype: _type_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">global_max</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="n">table_list</span><span class="p">:</span>
+        <span class="n">this_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">tab</span><span class="p">[</span><span class="n">sma_key</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">this_max</span> <span class="o">&gt;</span> <span class="n">global_max</span><span class="p">:</span>
+            <span class="n">global_max</span> <span class="o">=</span> <span class="n">this_max</span>
+    <span class="k">return</span> <span class="n">global_max</span></div>
+
+
+
+<div class="viewcode-block" id="interp_median"><a class="viewcode-back" href="../../galprime.html#galprime.medians.interp_median">[docs]</a><span class="k">def</span> <span class="nf">interp_median</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">interp_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the median for a list of interp1D object profiles</span>
+
+<span class="sd">    :param xs: The x slices to get the median at</span>
+<span class="sd">    :type xs: array_like</span>
+<span class="sd">    :param interp_list: The list of interp1D objects (individual profiles)</span>
+<span class="sd">    :type interp_list: list(scipy.interp1D)</span>
+<span class="sd">    :return: A 1D interpolation of the median profile.</span>
+<span class="sd">    :rtype: scipy.interpolate.interp1D</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">median_prof</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xs</span><span class="p">:</span>
+        <span class="n">median_prof</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">([</span><span class="n">interp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">interp</span> <span class="ow">in</span> <span class="n">interp_list</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">median_prof</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="s2">&quot;extrapolate&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="array2D_median"><a class="viewcode-back" href="../../galprime.html#galprime.medians.array2D_median">[docs]</a><span class="k">def</span> <span class="nf">array2D_median</span><span class="p">(</span><span class="n">array2D</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Get the median of a 2D array of profiles (used in bootstrap_median()) &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">array2D</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="boostrap_median"><a class="viewcode-back" href="../../galprime.html#galprime.medians.boostrap_median">[docs]</a><span class="k">def</span> <span class="nf">boostrap_median</span><span class="p">(</span><span class="n">table_list</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">x_step</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">plot_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plot_prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Generate an Astropy Table object containing the values from bootstrapping of a set of profiles.</span>
+
+<span class="sd">    :param table_list: A set of tables (outputs from galprime.isophote_fitting, processed using the to_table() </span>
+<span class="sd">        method). </span>
+<span class="sd">    :type table_list: list(Table())</span>
+<span class="sd">    :param iterations: The number of bootstrap iterations to run, defaults to 500</span>
+<span class="sd">    :type iterations: int, optional</span>
+<span class="sd">    :param x_step: The step between samples along the x-axis, defaults to 0.5</span>
+<span class="sd">    :type x_step: float, optional</span>
+<span class="sd">    :param plot_dir: Directory to generate output plots where if None, no plots are made, defaults to None</span>
+<span class="sd">    :type plot_dir: str, optional</span>
+<span class="sd">    :param plot_prefix: Prefix to include in the output plots. This is helpful if you have a </span>
+<span class="sd">                        bin and want to include which bin the plots are coming from, defaults to &quot;&quot;</span>
+<span class="sd">    :type plot_prefix: str, optional</span>
+<span class="sd">    :return: The table of </span>
+<span class="sd">    :rtype: astropy Table object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># We will start by making a 2D image with a shared x-axis, so we can sample WAY FASTER than using interp1D objects</span>
+    <span class="n">interp_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">interp1d</span><span class="p">(</span><span class="n">tab</span><span class="p">[</span><span class="s2">&quot;sma&quot;</span><span class="p">],</span> <span class="n">tab</span><span class="p">[</span><span class="s2">&quot;intens&quot;</span><span class="p">],</span> <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="s2">&quot;extrapolate&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="n">table_list</span><span class="p">]</span>
+    
+    <span class="n">x_slices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_sma</span><span class="p">(</span><span class="n">table_list</span><span class="p">),</span> <span class="n">x_step</span><span class="p">)</span>
+    <span class="n">full_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">interp_list</span><span class="p">:</span>
+        <span class="n">full_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">(</span><span class="n">x_slices</span><span class="p">))</span>
+    <span class="n">full_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">full_array</span><span class="p">)</span>     <span class="c1"># This is now a 2D array (basically an image)</span>
+
+    <span class="n">median_prof</span> <span class="o">=</span> <span class="n">array2D_median</span><span class="p">(</span><span class="n">full_array</span><span class="p">)</span>
+    <span class="n">bs_1sig_u</span><span class="p">,</span> <span class="n">bs_1sig_l</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="n">bs_2sig_u</span><span class="p">,</span> <span class="n">bs_2sig_l</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="n">bs_3sig_u</span><span class="p">,</span> <span class="n">bs_3sig_l</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+
+    <span class="n">lower_index_1sig</span><span class="p">,</span> <span class="n">upper_index_1sig</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">iterations</span> <span class="o">*</span> <span class="mf">0.159</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">iterations</span> <span class="o">*</span> <span class="mf">0.841</span><span class="p">)</span>
+    <span class="n">lower_index_2sig</span><span class="p">,</span> <span class="n">upper_index_2sig</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">iterations</span> <span class="o">*</span> <span class="mf">0.023</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">iterations</span> <span class="o">*</span> <span class="mf">0.977</span><span class="p">)</span>
+    <span class="n">lower_index_3sig</span><span class="p">,</span> <span class="n">upper_index_3sig</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">iterations</span> <span class="o">*</span> <span class="mf">0.002</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">iterations</span> <span class="o">*</span> <span class="mf">0.998</span><span class="p">)</span>
+
+
+    <span class="n">boostrapped_medians</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">table_list</span><span class="p">))</span>
+
+    <span class="c1"># Bootsrap our population, generate a new 2D array, and add the median of that to our list</span>
+    <span class="k">for</span> <span class="nb">iter</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
+        <span class="n">pop_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">table_list</span><span class="p">),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">pop_array2D</span> <span class="o">=</span> <span class="n">full_array</span><span class="p">[</span><span class="n">pop_indices</span><span class="p">]</span>
+        <span class="n">boostrapped_medians</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">array2D_median</span><span class="p">(</span><span class="n">pop_array2D</span><span class="p">))</span>
+    
+    <span class="n">boostrapped_medians</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">boostrapped_medians</span><span class="p">)</span>
+    
+    <span class="c1"># Now go through the y slices, and get the bootstrap values at each sigma interval</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">boostrapped_medians</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="n">y_slice</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">boostrapped_medians</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span>
+        <span class="n">bs_1sig_l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_slice</span><span class="p">[</span><span class="n">lower_index_1sig</span><span class="p">])</span>
+        <span class="n">bs_1sig_u</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_slice</span><span class="p">[</span><span class="n">upper_index_1sig</span><span class="p">])</span>
+        <span class="n">bs_2sig_l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_slice</span><span class="p">[</span><span class="n">lower_index_2sig</span><span class="p">])</span>
+        <span class="n">bs_2sig_u</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_slice</span><span class="p">[</span><span class="n">upper_index_2sig</span><span class="p">])</span>
+        <span class="n">bs_3sig_l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_slice</span><span class="p">[</span><span class="n">lower_index_3sig</span><span class="p">])</span>
+        <span class="n">bs_3sig_u</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_slice</span><span class="p">[</span><span class="n">upper_index_3sig</span><span class="p">])</span>
+
+    <span class="n">colnames</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SMA&quot;</span><span class="p">,</span> <span class="s2">&quot;MEDIAN&quot;</span><span class="p">,</span> <span class="s2">&quot;L_1SIG&quot;</span><span class="p">,</span> <span class="s2">&quot;U_1SIG&quot;</span><span class="p">,</span> <span class="s2">&quot;L_2SIG&quot;</span><span class="p">,</span> <span class="s2">&quot;U_2SIG&quot;</span><span class="p">,</span> <span class="s2">&quot;L_3SIG&quot;</span><span class="p">,</span> <span class="s2">&quot;U_3SIG&quot;</span><span class="p">,]</span>
+    <span class="n">bootstrap_table</span> <span class="o">=</span> <span class="n">Table</span><span class="p">([</span><span class="n">x_slices</span><span class="p">,</span> <span class="n">median_prof</span><span class="p">,</span> <span class="n">bs_1sig_l</span><span class="p">,</span> <span class="n">bs_1sig_u</span><span class="p">,</span> <span class="n">bs_2sig_l</span><span class="p">,</span> <span class="n">bs_2sig_u</span><span class="p">,</span> <span class="n">bs_3sig_l</span><span class="p">,</span> <span class="n">bs_3sig_u</span><span class="p">],</span>
+                            <span class="n">names</span><span class="o">=</span><span class="n">colnames</span><span class="p">)</span>
+    
+    <span class="c1"># Here are some nice plotting routines </span>
+    <span class="k">if</span> <span class="n">plot_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">plot_dir</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">plot_dir</span><span class="p">)</span>
+        
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">full_array</span><span class="p">),</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">6</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">([])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Input Profiles&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">plot_dir</span> <span class="o">+</span> <span class="n">plot_prefix</span> <span class="o">+</span> <span class="s2">&quot;_inputs.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">boostrapped_medians</span><span class="p">),</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">6</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">([])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Bootstrapped Median Profiles&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">plot_dir</span> <span class="o">+</span> <span class="n">plot_prefix</span> <span class="o">+</span> <span class="s2">&quot;_bootstrapped.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">full_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_slices</span><span class="p">,</span> <span class="n">full_array</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;grey&quot;</span><span class="p">)</span>
+        
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_slices</span><span class="p">,</span> <span class="n">median_prof</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mf">1e-6</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$SMA$ [pix]&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;I(R)&quot;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Profiles&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">plot_dir</span> <span class="o">+</span> <span class="n">plot_prefix</span> <span class="o">+</span> <span class="s2">&quot;_profiles.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_slices</span><span class="p">,</span> <span class="n">median_prof</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;Red&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_slices</span><span class="p">,</span> <span class="n">bs_3sig_u</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_slices</span><span class="p">,</span> <span class="n">bs_3sig_l</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_slices</span><span class="p">,</span> <span class="n">bs_2sig_u</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_slices</span><span class="p">,</span> <span class="n">bs_2sig_l</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_slices</span><span class="p">,</span> <span class="n">bs_1sig_u</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;grey&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_slices</span><span class="p">,</span> <span class="n">bs_1sig_l</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;grey&quot;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mf">1e-6</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$SMA$ [pix]&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;I(R)&quot;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Profiles&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">plot_dir</span> <span class="o">+</span> <span class="n">plot_prefix</span> <span class="o">+</span> <span class="s2">&quot;_boostrapped_medians.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">bootstrap_table</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Harrison Souchereau.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

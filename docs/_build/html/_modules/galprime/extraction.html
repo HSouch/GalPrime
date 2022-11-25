@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>galprime.extraction &mdash; GalPRIME  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> GalPRIME
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../galprime.html">GalPRIME Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../galprime.plotting.html">GalPRIME Plotting Methods</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GalPRIME</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">galprime.extraction</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for galprime.extraction</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">galprime.isophote_l</span> <span class="kn">import</span> <span class="n">Ellipse</span><span class="p">,</span> <span class="n">EllipseGeometry</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="nb">max</span><span class="p">,</span> <span class="n">pi</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">unravel_index</span><span class="p">,</span> <span class="n">argmax</span><span class="p">,</span> <span class="n">ceil</span>
+<span class="kn">from</span> <span class="nn">photutils</span> <span class="kn">import</span> <span class="n">data_properties</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+
+
+<div class="viewcode-block" id="isophote_fitting"><a class="viewcode-back" href="../../galprime.html#galprime.extraction.isophote_fitting">[docs]</a><span class="k">def</span> <span class="nf">isophote_fitting</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">centre_method</span><span class="o">=</span><span class="s1">&#39;standard&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Wrapper for photutils.isophote methods</span>
+
+<span class="sd">    Generates a table of results from isophote fitting analysis. This uses photutils Isophote procedure, which is</span>
+<span class="sd">    effectively IRAF&#39;s Ellipse() method.</span>
+<span class="sd">    Iterates over many possible input ellipses to force a higher success rate.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data: The input cutout</span>
+<span class="sd">        config: The configuration parameters, which contains details like STEP and LINEAR for profile extraction.</span>
+<span class="sd">        centre_method: Which method to use to determine where to place the centre of the first ellipse.</span>
+<span class="sd">            &#39;standard&#39;: place at the exact centre of the cutout</span>
+<span class="sd">            &#39;max&#39;: place at the maximum pixel in the cutout</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The table of results, or an empty list if not fitted successfully.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Set-up failsafe in case of strange infinte loops in photutils</span>
+    <span class="c1"># warnings.filterwarnings(&quot;error&quot;)</span>
+
+    <span class="n">fail_count</span><span class="p">,</span> <span class="n">max_fails</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span>
+    <span class="n">linear</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;LINEAR&quot;</span><span class="p">]</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="mf">1.</span> <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;LINEAR_STEP&quot;</span><span class="p">]</span>
+    <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;VERBOSE&quot;</span><span class="p">]</span>
+
+    <span class="c1"># Get centre of image and cutout halfwidth</span>
+    <span class="k">if</span> <span class="n">centre_method</span> <span class="o">==</span> <span class="s1">&#39;standard&#39;</span><span class="p">:</span>
+        <span class="n">centre</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">centre_method</span> <span class="o">==</span> <span class="s1">&#39;max&#39;</span><span class="p">:</span>
+        <span class="n">centre</span> <span class="o">=</span> <span class="n">unravel_index</span><span class="p">(</span><span class="n">argmax</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">centre</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">cutout_halfwidth</span> <span class="o">=</span> <span class="nb">max</span><span class="p">((</span><span class="n">ceil</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span> <span class="n">ceil</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)))</span>
+
+    <span class="n">fitting_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># First, try obtaining morphological properties from the data and fit using that starting ellipse</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">morph_cat</span> <span class="o">=</span> <span class="n">data_properties</span><span class="p">(</span><span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="mf">2.0</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="p">(</span><span class="n">morph_cat</span><span class="o">.</span><span class="n">xcentroid</span><span class="p">,</span> <span class="n">morph_cat</span><span class="o">.</span><span class="n">ycentroid</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">morph_cat</span><span class="o">.</span><span class="n">semimajor_sigma</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="n">r</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">morph_cat</span><span class="o">.</span><span class="n">semiminor_sigma</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="n">r</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">morph_cat</span><span class="o">.</span><span class="n">orientation</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="n">geometry</span> <span class="o">=</span> <span class="n">EllipseGeometry</span><span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">sma</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">b</span> <span class="o">/</span> <span class="n">a</span><span class="p">)),</span> <span class="n">pa</span><span class="o">=</span><span class="n">theta</span><span class="p">)</span>
+        <span class="n">flux</span> <span class="o">=</span> <span class="n">Ellipse</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">geometry</span><span class="p">)</span>
+        <span class="n">fitting_list</span> <span class="o">=</span> <span class="n">flux</span><span class="o">.</span><span class="n">fit_image</span><span class="p">(</span><span class="n">maxit</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">maxsma</span><span class="o">=</span><span class="n">cutout_halfwidth</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">,</span> <span class="n">linear</span><span class="o">=</span><span class="n">linear</span><span class="p">,</span>
+                                      <span class="n">maxrit</span><span class="o">=</span><span class="n">cutout_halfwidth</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fitting_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">fitting_list</span>
+
+    <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">OverflowError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
+        <span class="n">fail_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">fail_count</span> <span class="o">&gt;=</span> <span class="n">max_fails</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="c1"># If that fails, test a parameter space of starting ellipses</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">angle</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">45</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">sma</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">eps</span> <span class="ow">in</span> <span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">):</span>
+                    <span class="n">geometry</span> <span class="o">=</span> <span class="n">EllipseGeometry</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">centre</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">centre</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">,</span>
+                                               <span class="n">sma</span><span class="o">=</span><span class="n">sma</span><span class="p">,</span> <span class="n">pa</span><span class="o">=</span><span class="n">angle</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">/</span> <span class="mf">180.</span><span class="p">)</span>
+                    <span class="n">flux</span> <span class="o">=</span> <span class="n">Ellipse</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">geometry</span><span class="p">)</span>
+                    <span class="n">fitting_list</span> <span class="o">=</span> <span class="n">flux</span><span class="o">.</span><span class="n">fit_image</span><span class="p">(</span><span class="n">maxsma</span><span class="o">=</span><span class="n">cutout_halfwidth</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">,</span> <span class="n">linear</span><span class="o">=</span><span class="n">linear</span><span class="p">,</span>
+                                                  <span class="n">maxrit</span><span class="o">=</span><span class="n">cutout_halfwidth</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fitting_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">fitting_list</span>
+
+    <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">OverflowError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
+
+        <span class="c1"># print(&quot;RuntimeError or ValueError&quot;)</span>
+        <span class="n">fail_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">fail_count</span> <span class="o">&gt;=</span> <span class="n">max_fails</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+        <span class="n">fail_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">fail_count</span> <span class="o">&gt;=</span> <span class="n">max_fails</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="k">return</span> <span class="n">fitting_list</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Harrison Souchereau.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

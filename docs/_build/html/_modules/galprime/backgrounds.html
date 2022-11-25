@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>galprime.backgrounds &mdash; GalPRIME  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> GalPRIME
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../galprime.html">GalPRIME Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../galprime.plotting.html">GalPRIME Plotting Methods</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GalPRIME</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">galprime.backgrounds</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for galprime.backgrounds</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot; Background estimation and subtraction module.</span>
+
+<span class="sd">This module contains all methods available to estimate the backgrounds of cutouts,</span>
+<span class="sd">and to subtract these backgrounds from cutouts or profiles as a means to correct them.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">astropy.stats</span> <span class="kn">import</span> <span class="n">sigma_clipped_stats</span><span class="p">,</span> <span class="n">SigmaClip</span>
+<span class="kn">from</span> <span class="nn">astropy.convolution</span> <span class="kn">import</span> <span class="n">convolve</span><span class="p">,</span> <span class="n">Tophat2DKernel</span>
+
+<span class="kn">from</span> <span class="nn">photutils</span> <span class="kn">import</span> <span class="n">Background2D</span><span class="p">,</span> <span class="n">MedianBackground</span><span class="p">,</span> <span class="n">BkgZoomInterpolator</span><span class="p">,</span> <span class="n">make_source_mask</span>
+
+
+<div class="viewcode-block" id="background_2D"><a class="viewcode-back" href="../../galprime.html#galprime.backgrounds.background_2D">[docs]</a><span class="k">def</span> <span class="nf">background_2D</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">box_size</span><span class="p">,</span> <span class="n">interp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filter_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                  <span class="n">exclude_percentile</span><span class="o">=</span><span class="mi">90</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Run photutils background with SigmaClip and MedianBackground</span>
+
+<span class="sd">    :param img: The 2D input image</span>
+<span class="sd">    :type img: array_like (np.ndarray)</span>
+<span class="sd">    :param mask: The 2D image mask</span>
+<span class="sd">    :type mask: array_like (np.ndarray)</span>
+<span class="sd">    :param box_size: The size of the box used in the 2D background. It should be larger than</span>
+<span class="sd">        the largest objects in your image but still sufficiently small to capture large-scale</span>
+<span class="sd">        structure.</span>
+<span class="sd">    :type box_size: int, optional</span>
+<span class="sd">    :param filter_size: The window size of the median filter being applied to the background image. A</span>
+<span class="sd">        higher filter size will result in more smoothing to the background.</span>
+<span class="sd">    :type filter_size: int, optional</span>
+<span class="sd">    :param exclude_percentile: If the percentage of masked pixels in a box is above the exclude percentile,</span>
+<span class="sd">        it is not included in determining the 2D background.</span>
+<span class="sd">    :type exclude_percentile: float, optional</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">interp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">interp</span> <span class="o">=</span> <span class="n">BkgZoomInterpolator</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">Background2D</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">box_size</span><span class="p">,</span>
+                        <span class="n">sigma_clip</span><span class="o">=</span><span class="n">SigmaClip</span><span class="p">(</span><span class="n">sigma</span><span class="o">=</span><span class="mf">3.</span><span class="p">),</span>
+                        <span class="n">filter_size</span><span class="o">=</span><span class="n">filter_size</span><span class="p">,</span>
+                        <span class="n">bkg_estimator</span><span class="o">=</span><span class="n">MedianBackground</span><span class="p">(),</span>
+                        <span class="n">exclude_percentile</span><span class="o">=</span><span class="n">exclude_percentile</span><span class="p">,</span>
+                        <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span>
+                        <span class="n">interpolator</span><span class="o">=</span><span class="n">interp</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SourceMask"><a class="viewcode-back" href="../../galprime.html#galprime.backgrounds.SourceMask">[docs]</a><span class="k">class</span> <span class="nc">SourceMask</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">nsigma</span><span class="o">=</span><span class="mf">3.</span><span class="p">,</span> <span class="n">npixels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Helper for making &amp; dilating a source mask.</span>
+<span class="sd">             See Photutils docs for make_source_mask.</span>
+
+<span class="sd">            :param img: The image that is to be masked</span>
+<span class="sd">            :type img: array_like (np.ndarray)</span>
+<span class="sd">            :param nsigma: The sigma detection threshold for the source mask, defaults to 3</span>
+<span class="sd">            :type nsigma: float, optional</span>
+<span class="sd">            :param npixels: The number of required pixels for a detection, defaults to 10</span>
+<span class="sd">            :type npixels: int, optional</span>
+<span class="sd">            :param mask: An already-suppled mask for objects in the image.</span>
+<span class="sd">            :type array_like (np.ndarray), optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img</span> <span class="o">=</span> <span class="n">img</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nsigma</span> <span class="o">=</span> <span class="n">nsigma</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">npixels</span> <span class="o">=</span> <span class="n">npixels</span>
+        <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span>
+
+<div class="viewcode-block" id="SourceMask.single"><a class="viewcode-back" href="../../galprime.html#galprime.backgrounds.SourceMask.single">[docs]</a>    <span class="k">def</span> <span class="nf">single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_fwhm</span><span class="o">=</span><span class="mf">3.</span><span class="p">,</span> <span class="n">tophat_size</span><span class="o">=</span><span class="mf">5.</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Mask on a single scale &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">mask</span><span class="p">)</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">make_source_mask</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">nsigma</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nsigma</span><span class="p">,</span>
+                                <span class="n">npixels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">npixels</span><span class="p">,</span>
+                                <span class="n">dilate_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">filter_fwhm</span><span class="o">=</span><span class="n">filter_fwhm</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dilate_mask</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">tophat_size</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SourceMask.multiple"><a class="viewcode-back" href="../../galprime.html#galprime.backgrounds.SourceMask.multiple">[docs]</a>    <span class="k">def</span> <span class="nf">multiple</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_fwhm</span><span class="o">=</span><span class="p">[</span><span class="mf">3.</span><span class="p">],</span> <span class="n">tophat_size</span><span class="o">=</span><span class="p">[</span><span class="mf">3.</span><span class="p">],</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Mask repeatedly on different scales &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">fwhm</span><span class="p">,</span> <span class="n">tophat</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">filter_fwhm</span><span class="p">,</span> <span class="n">tophat_size</span><span class="p">):</span>
+            <span class="n">smask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">single</span><span class="p">(</span><span class="n">filter_fwhm</span><span class="o">=</span><span class="n">fwhm</span><span class="p">,</span> <span class="n">tophat_size</span><span class="o">=</span><span class="n">tophat</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">|</span> <span class="n">smask</span>  <span class="c1"># Or the masks at each iteration</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span></div>
+
+<div class="viewcode-block" id="SourceMask.dilated"><a class="viewcode-back" href="../../galprime.html#galprime.backgrounds.SourceMask.dilated">[docs]</a>    <span class="k">def</span> <span class="nf">dilated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tophat_size</span><span class="o">=</span><span class="p">[</span><span class="mf">3.</span><span class="p">],</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Mask using simple dilation&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">single</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">tophat</span> <span class="ow">in</span> <span class="n">tophat_size</span><span class="p">:</span>
+            <span class="n">smask</span> <span class="o">=</span> <span class="n">dilate_mask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">tophat</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">|</span> <span class="n">smask</span>  <span class="c1"># Or the masks at each iteration</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span></div></div>
+
+
+<div class="viewcode-block" id="dilate_mask"><a class="viewcode-back" href="../../galprime.html#galprime.backgrounds.dilate_mask">[docs]</a><span class="k">def</span> <span class="nf">dilate_mask</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">tophat_size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Dilate a mask with a tophat kernel. &quot;&quot;&quot;</span>
+    <span class="n">area</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">tophat_size</span> <span class="o">**</span> <span class="mf">2.</span>
+    <span class="n">kernel</span> <span class="o">=</span> <span class="n">Tophat2DKernel</span><span class="p">(</span><span class="n">tophat_size</span><span class="p">)</span>
+    <span class="n">dilated_mask</span> <span class="o">=</span> <span class="n">convolve</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">area</span>
+    <span class="k">return</span> <span class="n">dilated_mask</span></div>
+
+
+<div class="viewcode-block" id="estimate_background_sigclip"><a class="viewcode-back" href="../../galprime.html#galprime.backgrounds.estimate_background_sigclip">[docs]</a><span class="k">def</span> <span class="nf">estimate_background_sigclip</span><span class="p">(</span><span class="n">cutout</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nsigma</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">npixels</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">dilate_size</span><span class="o">=</span><span class="mi">7</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Estimate the background mean, median, and standard deviation of a cutout using sigma-clipped-stats &quot;&quot;&quot;</span>
+
+    <span class="n">nsigma</span> <span class="ow">is</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;MASK_PARAMS&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">nsigma</span>
+    <span class="n">npixels</span> <span class="ow">is</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;MASK_PARAMS&quot;</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">npixels</span>
+
+    <span class="n">bg_mask</span> <span class="o">=</span> <span class="n">make_source_mask</span><span class="p">(</span><span class="n">cutout</span><span class="p">,</span> <span class="n">nsigma</span><span class="o">=</span><span class="n">nsigma</span><span class="p">,</span> <span class="n">npixels</span><span class="o">=</span><span class="n">npixels</span><span class="p">,</span> <span class="n">dilate_size</span><span class="o">=</span><span class="n">dilate_size</span><span class="p">)</span>
+
+    <span class="n">bg_mean</span><span class="p">,</span> <span class="n">bg_median</span><span class="p">,</span> <span class="n">bg_std</span> <span class="o">=</span> <span class="n">sigma_clipped_stats</span><span class="p">(</span><span class="n">cutout</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">bg_mask</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">bg_mean</span><span class="p">,</span> <span class="n">bg_median</span><span class="p">,</span> <span class="n">bg_std</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Harrison Souchereau.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

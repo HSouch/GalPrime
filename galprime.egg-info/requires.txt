@@ -1,0 +1,6 @@
+scikit-image
+numpy
+photutils
+astropy
+pebble
+tqdm

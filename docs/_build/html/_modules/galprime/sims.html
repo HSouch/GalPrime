@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>galprime.sims &mdash; GalPRIME  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> GalPRIME
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../galprime.html">GalPRIME Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../galprime.plotting.html">GalPRIME Plotting Methods</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GalPRIME</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">galprime.sims</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for galprime.sims</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">galprime</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
+<span class="kn">from</span> <span class="nn">astropy.convolution</span> <span class="kn">import</span> <span class="n">Gaussian2DKernel</span>
+
+<span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">randint</span>
+<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">convolve2d</span>
+
+<span class="kn">import</span> <span class="nn">galprime</span>
+
+<span class="kn">from</span> <span class="nn">pebble</span> <span class="kn">import</span> <span class="n">ProcessPool</span>
+<span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="ne">TimeoutError</span>
+
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<div class="viewcode-block" id="GalPrimeError"><a class="viewcode-back" href="../../galprime.html#galprime.sims.GalPrimeError">[docs]</a><span class="k">class</span> <span class="nc">GalPrimeError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="GPrime"><a class="viewcode-back" href="../../galprime.html#galprime.sims.GPrime">[docs]</a><span class="k">class</span> <span class="nc">GPrime</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; Class to create and run GalPrime simulations &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">psfs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">backgrounds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mag_kde</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">galprime</span><span class="o">.</span><span class="n">default_config_params</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">config</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">galprime</span><span class="o">.</span><span class="n">load_config_file</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">config</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">GalPrimeError</span><span class="p">(</span><span class="s2">&quot;Uncertain format for config file. File needs to be dict object or str filename.&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">binned_objects</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">psfs</span> <span class="o">=</span> <span class="n">psfs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backgrounds</span> <span class="o">=</span> <span class="n">backgrounds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mag_kde</span> <span class="o">=</span> <span class="n">mag_kde</span>
+
+<div class="viewcode-block" id="GPrime.load_bins"><a class="viewcode-back" href="../../galprime.html#galprime.sims.GPrime.load_bins">[docs]</a>    <span class="k">def</span> <span class="nf">load_bins</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">binned_objects</span> <span class="o">=</span> <span class="n">galprime</span><span class="o">.</span><span class="n">bin_catalog</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span></div>
+    
+    
+<div class="viewcode-block" id="GPrime.pipeline"><a class="viewcode-back" href="../../galprime.html#galprime.sims.GPrime.pipeline">[docs]</a>    <span class="k">def</span> <span class="nf">pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_bins</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mag_kde</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">process_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+                 <span class="n">table_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span><span class="s2">&quot;IMG&quot;</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="s2">&quot;RA&quot;</span><span class="p">,</span> <span class="s2">&quot;DEC&quot;</span><span class="p">,</span> <span class="s2">&quot;MAGS&quot;</span><span class="p">,</span> <span class="s2">&quot;R50S&quot;</span><span class="p">,</span> <span class="s2">&quot;NS&quot;</span><span class="p">,</span> <span class="s2">&quot;ELLIPS&quot;</span><span class="p">,</span> <span class="s2">&quot;MASS_MED&quot;</span><span class="p">,</span>
+                              <span class="s2">&quot;ZPHOT&quot;</span><span class="p">,</span> <span class="s2">&quot;sfProb&quot;</span><span class="p">,</span> <span class="s2">&quot;I_R50&quot;</span><span class="p">,</span> <span class="s2">&quot;PA&quot;</span><span class="p">,</span> <span class="s2">&quot;R50_PIX&quot;</span><span class="p">,</span> <span class="s2">&quot;BG_MEAN&quot;</span><span class="p">,</span> <span class="s2">&quot;BG_MED&quot;</span><span class="p">,</span> <span class="s2">&quot;BG_STD&quot;</span><span class="p">,</span>
+                              <span class="s2">&quot;NSEG_BGA&quot;</span><span class="p">,</span> <span class="s2">&quot;CENT_BGA&quot;</span><span class="p">,</span> <span class="s2">&quot;N_MASKED_BGA&quot;</span><span class="p">,</span> <span class="s2">&quot;P_MASKED_BGA&quot;</span><span class="p">,</span> <span class="s2">&quot;NSEG_BGSUB&quot;</span><span class="p">,</span> <span class="s2">&quot;CENT_BGSUB&quot;</span><span class="p">,</span> 
+                              <span class="s2">&quot;N_MASKED_BGSUB&quot;</span><span class="p">,</span> <span class="s2">&quot;P_MASKED_BGSUB&quot;</span><span class="p">]):</span>
+        
+        <span class="c1"># Bin out catalog based on the catalog in the configuration file</span>
+        <span class="n">binned_objects</span> <span class="o">=</span> <span class="n">galprime</span><span class="o">.</span><span class="n">bin_catalog</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">max_bins</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">binned_objects</span><span class="o">.</span><span class="n">bins</span><span class="p">)</span> <span class="k">if</span> <span class="n">max_bins</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">max_bins</span>
+        <span class="n">verbose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;VERBOSE&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running GalPRIME, version&quot;</span><span class="p">,</span> <span class="n">galprime</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">binned_objects</span><span class="o">.</span><span class="n">bins</span><span class="p">),</span> <span class="s2">&quot;in total. Running GalPRIME on&quot;</span><span class="p">,</span> <span class="n">max_bins</span><span class="p">)</span>
+
+
+        <span class="c1"># Create all of our necessary filestructure</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;OUT_DIR&quot;</span><span class="p">]):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;OUT_DIR&quot;</span><span class="p">])</span>
+
+        <span class="c1"># Generate the full filestructure, including containers for the individual profiles, and the medians</span>
+        <span class="n">galprime</span><span class="o">.</span><span class="n">gen_filestructure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;OUT_DIR&quot;</span><span class="p">])</span>
+        <span class="n">bare_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;OUT_DIR&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;bare_profiles/&quot;</span>
+        <span class="n">bgadded_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;OUT_DIR&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;bgadded_profiles/&quot;</span>
+        <span class="n">bgsub_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;OUT_DIR&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;bgsub_profiles/&quot;</span>
+        
+        <span class="n">bare_median_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;OUT_DIR&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;bare_medians/&quot;</span>
+        <span class="n">bgadded_median_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;OUT_DIR&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;bgadded_medians/&quot;</span>
+        <span class="n">bgsub_median_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;OUT_DIR&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;bgsub_medians/&quot;</span>
+
+        <span class="n">additional_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;OUT_DIR&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;additional_info/&quot;</span>
+
+        
+        <span class="c1"># Run through bins and process using the method</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_bins</span><span class="p">):</span>
+            <span class="n">current_bin</span> <span class="o">=</span> <span class="n">binned_objects</span><span class="o">.</span><span class="n">bins</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            
+            <span class="n">columns</span> <span class="o">=</span> <span class="n">current_bin</span><span class="o">.</span><span class="n">columns</span><span class="p">()</span>
+            
+            <span class="c1"># Generate the object KDE that will be used by this bin</span>
+            <span class="n">kde</span> <span class="o">=</span> <span class="n">galprime</span><span class="o">.</span><span class="n">object_kde</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
+                        
+            <span class="n">job_list</span><span class="p">,</span> <span class="n">job_results</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+            <span class="c1"># Set up the job pool</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generating&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;N_MODELS&quot;</span><span class="p">],</span> <span class="s2">&quot;models for bin:&quot;</span><span class="p">,</span> <span class="n">current_bin</span><span class="o">.</span><span class="n">bin_params</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">ProcessPool</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;CORES&quot;</span><span class="p">])</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;N_MODELS&quot;</span><span class="p">]):</span>
+                    <span class="n">job_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pool</span><span class="o">.</span><span class="n">schedule</span><span class="p">(</span><span class="n">process_method</span><span class="p">,</span>
+                                                <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_bin</span><span class="p">,</span> <span class="n">kde</span><span class="p">),</span>
+                                                <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;TIME_LIMIT&quot;</span><span class="p">]))</span>
+            <span class="c1"># Now get all the results</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">job</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">job_list</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">job_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">result</span><span class="p">())</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            
+            <span class="n">prefix</span> <span class="o">=</span> <span class="n">galprime</span><span class="o">.</span><span class="n">gen_out_prefix</span><span class="p">(</span><span class="n">current_bin</span><span class="o">.</span><span class="n">bin_params</span><span class="p">)</span>
+            <span class="n">index_prefix</span> <span class="o">=</span> <span class="n">galprime</span><span class="o">.</span><span class="n">gen_index_prefix</span><span class="p">(</span><span class="n">current_bin</span><span class="o">.</span><span class="n">bin_params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+
+            <span class="n">bare_hdulist</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">HDUList</span><span class="p">()</span>
+            <span class="n">bgadded_hdulist</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">HDUList</span><span class="p">()</span>
+            <span class="n">bgsub_hdulist</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">HDUList</span><span class="p">()</span>
+
+            <span class="c1"># Clean the jobs of any that just so happened to fail and return junk profiles</span>
+            <span class="n">cleaned_containers</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">container</span> <span class="ow">in</span> <span class="n">job_results</span><span class="p">:</span>
+                <span class="n">good</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">for</span> <span class="n">prof</span> <span class="ow">in</span> <span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">model_profile</span><span class="p">,</span> <span class="n">container</span><span class="o">.</span><span class="n">bgadded_profile</span><span class="p">,</span> <span class="n">container</span><span class="o">.</span><span class="n">bgsub_profile</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">prof</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">good</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="k">break</span>
+                <span class="k">if</span> <span class="n">good</span><span class="p">:</span>
+                    <span class="n">cleaned_containers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Profiles cleaned&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">job_results</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">cleaned_containers</span><span class="p">))</span>
+            <span class="n">job_results</span> <span class="o">=</span> <span class="n">cleaned_containers</span>
+                    
+                        
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">container</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">job_results</span><span class="p">):</span>
+                <span class="n">bare_hdulist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fits</span><span class="o">.</span><span class="n">BinTableHDU</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">galprime</span><span class="o">.</span><span class="n">table_from_isolist</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">model_profile</span><span class="p">)))</span>
+                <span class="n">bgadded_hdulist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fits</span><span class="o">.</span><span class="n">BinTableHDU</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">galprime</span><span class="o">.</span><span class="n">table_from_isolist</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">bgadded_profile</span><span class="p">)))</span>
+                <span class="n">bgsub_hdulist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fits</span><span class="o">.</span><span class="n">BinTableHDU</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">galprime</span><span class="o">.</span><span class="n">table_from_isolist</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">bgsub_profile</span><span class="p">)))</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">bare_hdulist</span><span class="o">.</span><span class="n">writeto</span><span class="p">(</span><span class="n">bare_dir</span> <span class="o">+</span> <span class="n">index_prefix</span> <span class="o">+</span> <span class="s2">&quot;bare.fits&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">bgadded_hdulist</span><span class="o">.</span><span class="n">writeto</span><span class="p">(</span><span class="n">bgadded_dir</span> <span class="o">+</span> <span class="n">index_prefix</span> <span class="o">+</span> <span class="s2">&quot;bgadded.fits&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">bgsub_hdulist</span><span class="o">.</span><span class="n">writeto</span><span class="p">(</span><span class="n">bgsub_dir</span> <span class="o">+</span> <span class="n">index_prefix</span> <span class="o">+</span> <span class="s2">&quot;bgsub.fits&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error Generating Data Products (Not good!):&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">bare_profiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">galprime</span><span class="o">.</span><span class="n">table_from_isolist</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">model_profile</span><span class="p">)</span> <span class="k">for</span> <span class="n">container</span> <span class="ow">in</span> <span class="n">job_results</span><span class="p">]</span>
+                <span class="n">bare_median_table</span> <span class="o">=</span> <span class="n">galprime</span><span class="o">.</span><span class="n">boostrap_median</span><span class="p">(</span><span class="n">bare_profiles</span><span class="p">)</span>
+                <span class="n">bare_median_table</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">bare_median_dir</span> <span class="o">+</span> <span class="n">index_prefix</span> <span class="o">+</span> <span class="s2">&quot;medians.fits&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error Bootstrapping Bare:&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>    
+                <span class="n">bgadded_profiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">galprime</span><span class="o">.</span><span class="n">table_from_isolist</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">bgadded_profile</span><span class="p">)</span> <span class="k">for</span> <span class="n">container</span> <span class="ow">in</span> <span class="n">job_results</span><span class="p">]</span>
+                <span class="n">bgadded_median_table</span> <span class="o">=</span> <span class="n">galprime</span><span class="o">.</span><span class="n">boostrap_median</span><span class="p">(</span><span class="n">bgadded_profiles</span><span class="p">)</span>
+                <span class="n">bgadded_median_table</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">bgadded_median_dir</span> <span class="o">+</span> <span class="n">index_prefix</span> <span class="o">+</span> <span class="s2">&quot;medians.fits&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error Bootstrapping Bgadded:&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">bgsub_profiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">galprime</span><span class="o">.</span><span class="n">table_from_isolist</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">bgsub_profile</span><span class="p">)</span> <span class="k">for</span> <span class="n">container</span> <span class="ow">in</span> <span class="n">job_results</span><span class="p">]</span>
+                <span class="n">bgsub_median_table</span> <span class="o">=</span> <span class="n">galprime</span><span class="o">.</span><span class="n">boostrap_median</span><span class="p">(</span><span class="n">bgsub_profiles</span><span class="p">)</span>
+                <span class="n">bgsub_median_table</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">bgsub_median_dir</span> <span class="o">+</span> <span class="n">index_prefix</span> <span class="o">+</span> <span class="s2">&quot;medians.fits&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error Bootstrapping Bgsub:&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">args</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="gprime_single"><a class="viewcode-back" href="../../galprime.html#galprime.sims.gprime_single">[docs]</a><span class="k">def</span> <span class="nf">gprime_single</span><span class="p">(</span><span class="n">gprime_obj</span><span class="p">,</span> <span class="n">current_bin</span><span class="p">,</span> <span class="n">kde</span><span class="p">):</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;NAMES&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_bin</span><span class="o">.</span><span class="n">object_column_names</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;BIN_PARAMS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_bin</span><span class="o">.</span><span class="n">bin_params</span>
+
+    <span class="c1"># Select a background and add the background info to the metadata</span>
+    <span class="n">bg_index</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gprime_obj</span><span class="o">.</span><span class="n">backgrounds</span><span class="o">.</span><span class="n">cutouts</span><span class="p">))</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;BG_INDEX&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bg_index</span>
+    <span class="n">metadata</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">gprime_obj</span><span class="o">.</span><span class="n">backgrounds</span><span class="o">.</span><span class="n">cutout_data</span><span class="p">[</span><span class="n">bg_index</span><span class="p">])</span>
+
+    <span class="c1"># Get the best PSF is the user has supplied PSFs to the pipeline</span>
+    <span class="c1"># Otherwise, just use a simple Gaussian2D kernel from astropy</span>
+    <span class="k">if</span> <span class="n">gprime_obj</span><span class="o">.</span><span class="n">psfs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">psf</span> <span class="o">=</span> <span class="n">Gaussian2DKernel</span><span class="p">(</span><span class="n">x_stddev</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">y_stddev</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">psf</span> <span class="o">=</span> <span class="n">galprime</span><span class="o">.</span><span class="n">get_closest_psf</span><span class="p">(</span><span class="n">gprime_obj</span><span class="o">.</span><span class="n">psfs</span><span class="p">,</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;RA&quot;</span><span class="p">],</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;DEC&quot;</span><span class="p">])</span>
+
+    <span class="c1"># Generate our container</span>
+    <span class="n">container</span> <span class="o">=</span> <span class="n">galprime</span><span class="o">.</span><span class="n">GalPrimeContainer</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">gprime_obj</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">kde</span><span class="o">=</span><span class="n">kde</span><span class="p">,</span> <span class="n">psf</span><span class="o">=</span><span class="n">psf</span><span class="p">,</span>
+                                    <span class="n">background_cutout</span><span class="o">=</span><span class="n">gprime_obj</span><span class="o">.</span><span class="n">backgrounds</span><span class="o">.</span><span class="n">cutouts</span><span class="p">[</span><span class="n">bg_index</span><span class="p">],</span> 
+                                    <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
+    <span class="n">container</span><span class="o">.</span><span class="n">process_object</span><span class="p">(</span><span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">container</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Harrison Souchereau.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GalPRIME Modules &mdash; GalPRIME  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="GalPRIME Plotting Methods" href="galprime.plotting.html" />
+    <link rel="prev" title="GalPRIME" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> GalPRIME
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">GalPRIME Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-galprime.backgrounds">2D Background Modelling and Subtraction (galprime.backgrounds)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.backgrounds.SourceMask"><code class="docutils literal notranslate"><span class="pre">SourceMask</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#galprime.backgrounds.SourceMask.dilated"><code class="docutils literal notranslate"><span class="pre">SourceMask.dilated()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#galprime.backgrounds.SourceMask.multiple"><code class="docutils literal notranslate"><span class="pre">SourceMask.multiple()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#galprime.backgrounds.SourceMask.single"><code class="docutils literal notranslate"><span class="pre">SourceMask.single()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.backgrounds.background_2D"><code class="docutils literal notranslate"><span class="pre">background_2D()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.backgrounds.dilate_mask"><code class="docutils literal notranslate"><span class="pre">dilate_mask()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.backgrounds.estimate_background_sigclip"><code class="docutils literal notranslate"><span class="pre">estimate_background_sigclip()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-galprime.binning">Catalogue Binning (binning)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.binning.Bin"><code class="docutils literal notranslate"><span class="pre">Bin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#galprime.binning.Bin.columns"><code class="docutils literal notranslate"><span class="pre">Bin.columns()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#galprime.binning.Bin.file_prefix"><code class="docutils literal notranslate"><span class="pre">Bin.file_prefix()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#galprime.binning.Bin.param_dict"><code class="docutils literal notranslate"><span class="pre">Bin.param_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#galprime.binning.Bin.rebin"><code class="docutils literal notranslate"><span class="pre">Bin.rebin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#galprime.binning.Bin.to_table"><code class="docutils literal notranslate"><span class="pre">Bin.to_table()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.binning.BinList"><code class="docutils literal notranslate"><span class="pre">BinList</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#galprime.binning.BinList.rebin"><code class="docutils literal notranslate"><span class="pre">BinList.rebin()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.binning.bin_catalog"><code class="docutils literal notranslate"><span class="pre">bin_catalog()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.binning.plot_bin_params"><code class="docutils literal notranslate"><span class="pre">plot_bin_params()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-galprime.config">Configuring GalPRIME (config)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.config.config_to_file"><code class="docutils literal notranslate"><span class="pre">config_to_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.config.default_config_params"><code class="docutils literal notranslate"><span class="pre">default_config_params()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.config.dump_default_config_file"><code class="docutils literal notranslate"><span class="pre">dump_default_config_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.config.dump_default_config_file_koe"><code class="docutils literal notranslate"><span class="pre">dump_default_config_file_koe()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.config.load_config_file"><code class="docutils literal notranslate"><span class="pre">load_config_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.config.load_config_file_koe"><code class="docutils literal notranslate"><span class="pre">load_config_file_koe()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.config.print_config"><code class="docutils literal notranslate"><span class="pre">print_config()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-galprime.data">Data Handling (data)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.data.CutoutList"><code class="docutils literal notranslate"><span class="pre">CutoutList</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#galprime.data.CutoutList.cutouts_to_file"><code class="docutils literal notranslate"><span class="pre">CutoutList.cutouts_to_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#galprime.data.CutoutList.update_medatada"><code class="docutils literal notranslate"><span class="pre">CutoutList.update_medatada()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.data.cutouts_from_file"><code class="docutils literal notranslate"><span class="pre">cutouts_from_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.data.dict_extend"><code class="docutils literal notranslate"><span class="pre">dict_extend()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.data.gen_backgrounds"><code class="docutils literal notranslate"><span class="pre">gen_backgrounds()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.data.gen_cutouts"><code class="docutils literal notranslate"><span class="pre">gen_cutouts()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.data.gen_filestructure"><code class="docutils literal notranslate"><span class="pre">gen_filestructure()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.data.gen_index_prefix"><code class="docutils literal notranslate"><span class="pre">gen_index_prefix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.data.gen_out_prefix"><code class="docutils literal notranslate"><span class="pre">gen_out_prefix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.data.get_angular_size_dist"><code class="docutils literal notranslate"><span class="pre">get_angular_size_dist()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.data.get_closest_psf"><code class="docutils literal notranslate"><span class="pre">get_closest_psf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.data.get_image_filenames"><code class="docutils literal notranslate"><span class="pre">get_image_filenames()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.data.get_wcs"><code class="docutils literal notranslate"><span class="pre">get_wcs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.data.good_isolist_names"><code class="docutils literal notranslate"><span class="pre">good_isolist_names()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.data.ordered_dict"><code class="docutils literal notranslate"><span class="pre">ordered_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.data.table_from_isolist"><code class="docutils literal notranslate"><span class="pre">table_from_isolist()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.data.to_sb"><code class="docutils literal notranslate"><span class="pre">to_sb()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#determining-cutout-density-densities">Determining Cutout Density (densities)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-galprime.extraction">1D Surface Brightness Profile Extraction (extraction)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.extraction.isophote_fitting"><code class="docutils literal notranslate"><span class="pre">isophote_fitting()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-galprime.koe">Automated Profile Extraction with Koe (koe)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.koe.koe_pipeline"><code class="docutils literal notranslate"><span class="pre">koe_pipeline()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.koe.process_object"><code class="docutils literal notranslate"><span class="pre">process_object()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-galprime.masking">Cutout Masking (masking)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.masking.MaskedCutout"><code class="docutils literal notranslate"><span class="pre">MaskedCutout</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#galprime.masking.MaskedCutout.apply_mask"><code class="docutils literal notranslate"><span class="pre">MaskedCutout.apply_mask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#galprime.masking.MaskedCutout.gen_mask"><code class="docutils literal notranslate"><span class="pre">MaskedCutout.gen_mask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#galprime.masking.MaskedCutout.mask_cutout"><code class="docutils literal notranslate"><span class="pre">MaskedCutout.mask_cutout()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-galprime.medians">Medians and Bootstrapping (medians)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.medians.array2D_median"><code class="docutils literal notranslate"><span class="pre">array2D_median()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.medians.boostrap_median"><code class="docutils literal notranslate"><span class="pre">boostrap_median()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.medians.interp_median"><code class="docutils literal notranslate"><span class="pre">interp_median()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.medians.max_sma"><code class="docutils literal notranslate"><span class="pre">max_sma()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-galprime.modelling">2D Galaxy Modelling (modelling)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.modelling.b"><code class="docutils literal notranslate"><span class="pre">b()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.modelling.check_sersic_params"><code class="docutils literal notranslate"><span class="pre">check_sersic_params()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.modelling.gen_sersic_model"><code class="docutils literal notranslate"><span class="pre">gen_sersic_model()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.modelling.i_at_r50"><code class="docutils literal notranslate"><span class="pre">i_at_r50()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.modelling.model_from_kde"><code class="docutils literal notranslate"><span class="pre">model_from_kde()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.modelling.object_kde"><code class="docutils literal notranslate"><span class="pre">object_kde()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-galprime.profiles">1D Surface Brightness Profile Handling (profiles)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-galprime.sims">GalPRIME Simulation Routines (sims)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.sims.GPrime"><code class="docutils literal notranslate"><span class="pre">GPrime</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#galprime.sims.GPrime.load_bins"><code class="docutils literal notranslate"><span class="pre">GPrime.load_bins()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#galprime.sims.GPrime.pipeline"><code class="docutils literal notranslate"><span class="pre">GPrime.pipeline()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.sims.GalPrimeError"><code class="docutils literal notranslate"><span class="pre">GalPrimeError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galprime.sims.gprime_single"><code class="docutils literal notranslate"><span class="pre">gprime_single()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="galprime.plotting.html">GalPRIME Plotting Methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="subdocs/running_galprime.html">Running GalPrime</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GalPRIME</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">GalPRIME Modules</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/galprime.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="galprime-modules">
+<h1>GalPRIME Modules<a class="headerlink" href="#galprime-modules" title="Permalink to this heading"></a></h1>
+<section id="module-galprime.backgrounds">
+<span id="d-background-modelling-and-subtraction-galprime-backgrounds"></span><h2>2D Background Modelling and Subtraction (galprime.backgrounds)<a class="headerlink" href="#module-galprime.backgrounds" title="Permalink to this heading"></a></h2>
+<p>Background estimation and subtraction module.</p>
+<p>This module contains all methods available to estimate the backgrounds of cutouts,
+and to subtract these backgrounds from cutouts or profiles as a means to correct them.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="galprime.backgrounds.SourceMask">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SourceMask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npixels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/backgrounds.html#SourceMask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.backgrounds.SourceMask" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="galprime.backgrounds.SourceMask.dilated">
+<span class="sig-name descname"><span class="pre">dilated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tophat_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[3.0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/backgrounds.html#SourceMask.dilated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.backgrounds.SourceMask.dilated" title="Permalink to this definition"></a></dt>
+<dd><p>Mask using simple dilation</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="galprime.backgrounds.SourceMask.multiple">
+<span class="sig-name descname"><span class="pre">multiple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter_fwhm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[3.0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tophat_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[3.0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/backgrounds.html#SourceMask.multiple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.backgrounds.SourceMask.multiple" title="Permalink to this definition"></a></dt>
+<dd><p>Mask repeatedly on different scales</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="galprime.backgrounds.SourceMask.single">
+<span class="sig-name descname"><span class="pre">single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter_fwhm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tophat_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/backgrounds.html#SourceMask.single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.backgrounds.SourceMask.single" title="Permalink to this definition"></a></dt>
+<dd><p>Mask on a single scale</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.backgrounds.background_2D">
+<span class="sig-name descname"><span class="pre">background_2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_percentile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">90</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/backgrounds.html#background_2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.backgrounds.background_2D" title="Permalink to this definition"></a></dt>
+<dd><p>Run photutils background with SigmaClip and MedianBackground</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> (<em>array_like</em><em> (</em><em>np.ndarray</em><em>)</em>) – The 2D input image</p></li>
+<li><p><strong>mask</strong> (<em>array_like</em><em> (</em><em>np.ndarray</em><em>)</em>) – The 2D image mask</p></li>
+<li><p><strong>box_size</strong> (<em>int</em><em>, </em><em>optional</em>) – The size of the box used in the 2D background. It should be larger than
+the largest objects in your image but still sufficiently small to capture large-scale
+structure.</p></li>
+<li><p><strong>filter_size</strong> (<em>int</em><em>, </em><em>optional</em>) – The window size of the median filter being applied to the background image. A
+higher filter size will result in more smoothing to the background.</p></li>
+<li><p><strong>exclude_percentile</strong> (<em>float</em><em>, </em><em>optional</em>) – If the percentage of masked pixels in a box is above the exclude percentile,
+it is not included in determining the 2D background.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.backgrounds.dilate_mask">
+<span class="sig-name descname"><span class="pre">dilate_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tophat_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/backgrounds.html#dilate_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.backgrounds.dilate_mask" title="Permalink to this definition"></a></dt>
+<dd><p>Dilate a mask with a tophat kernel.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.backgrounds.estimate_background_sigclip">
+<span class="sig-name descname"><span class="pre">estimate_background_sigclip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cutout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npixels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dilate_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/backgrounds.html#estimate_background_sigclip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.backgrounds.estimate_background_sigclip" title="Permalink to this definition"></a></dt>
+<dd><p>Estimate the background mean, median, and standard deviation of a cutout using sigma-clipped-stats</p>
+</dd></dl>
+
+</section>
+<section id="module-galprime.binning">
+<span id="catalogue-binning-binning"></span><h2>Catalogue Binning (binning)<a class="headerlink" href="#module-galprime.binning" title="Permalink to this heading"></a></h2>
+<p>Binning methods</p>
+<p>This module contains all necessary methods for binning catalogues according to various parameters.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="galprime.binning.Bin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Bin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">objects</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_column_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/binning.html#Bin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.binning.Bin" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for a single bin of information
+:param objects: The catalog rows that belong to the given bin
+:type bin_param_names: array_like
+:param object_column_names: The column names when the objects are sorted column-wise instead of row-wise.
+:type bin_param_names: array_like
+:param bin_params (arr): The values that define the bounds of the bin.
+:type bin_param_names: array_like
+:param bin_param_names (arr): Array of parameter names that the bin was made with.
+:type bin_param_names: array_like</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="galprime.binning.Bin.columns">
+<span class="sig-name descname"><span class="pre">columns</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/binning.html#Bin.columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.binning.Bin.columns" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="galprime.binning.Bin.file_prefix">
+<span class="sig-name descname"><span class="pre">file_prefix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/binning.html#Bin.file_prefix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.binning.Bin.file_prefix" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="galprime.binning.Bin.param_dict">
+<span class="sig-name descname"><span class="pre">param_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/binning.html#Bin.param_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.binning.Bin.param_dict" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="galprime.binning.Bin.rebin">
+<span class="sig-name descname"><span class="pre">rebin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/binning.html#Bin.rebin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.binning.Bin.rebin" title="Permalink to this definition"></a></dt>
+<dd><p>Rebin a bin according to a set of bounds and a 
+given index</p>
+<p>index: the column index to bin by
+bounds: The bounds to place the objects in</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="galprime.binning.Bin.to_table">
+<span class="sig-name descname"><span class="pre">to_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/binning.html#Bin.to_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.binning.Bin.to_table" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a astropy.table.Table object for the objects and names contained
+within the bin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Filename for saving, defaults to None</p></li>
+<li><p><strong>overwrite</strong> (<em>bool</em><em>, </em><em>optional</em>) – Overwrite filename to save, defaults to False</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Table of data parameters and associated</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>astropy.table.Table()</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="galprime.binning.BinList">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BinList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/binning.html#BinList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.binning.BinList" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Container class for bins</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="galprime.binning.BinList.rebin">
+<span class="sig-name descname"><span class="pre">rebin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/binning.html#BinList.rebin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.binning.BinList.rebin" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.binning.bin_catalog">
+<span class="sig-name descname"><span class="pre">bin_catalog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/binning.html#bin_catalog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.binning.bin_catalog" title="Permalink to this definition"></a></dt>
+<dd><p>Bin the inputted catalog.</p>
+<p>This is a convenience function to get a list of bins based on redshift, star-formation, and mass.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>dict</em>) – Values from input config file or user inputs.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of bins that have been binned according to the config settings.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.binning.plot_bin_params">
+<span class="sig-name descname"><span class="pre">plot_bin_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/binning.html#plot_bin_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.binning.plot_bin_params" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a nice plot of a bin’s structural parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>b</strong> (<a class="reference internal" href="#galprime.binning.Bin" title="galprime.binning.Bin"><em>Bin</em></a>) – Input bin</p></li>
+<li><p><strong>columns</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of columns per row, defaults to 4</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Output filename, defaults to None
+If none, plt.show() is run instead</p></li>
+<li><p><strong>dpi</strong> (<em>int</em><em>, </em><em>optional</em>) – DPI for saved image, defaults to 150</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-galprime.config">
+<span id="configuring-galprime-config"></span><h2>Configuring GalPRIME (config)<a class="headerlink" href="#module-galprime.config" title="Permalink to this heading"></a></h2>
+<p>Configuration settings methods.</p>
+<p>This module contains all methods required to properly set up or read a configuration file for use with TBriDGE.</p>
+<p>subdocs/running_galprime</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.config.config_to_file">
+<span class="sig-name descname"><span class="pre">config_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config_out.galprime'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/config.html#config_to_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.config.config_to_file" title="Permalink to this definition"></a></dt>
+<dd><p>Write a config dict to a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<em>dict</em>) – The configuration parameters.</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – The location where the parameters will be written, defaults to config_out.galprime.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.config.default_config_params">
+<span class="sig-name descname"><span class="pre">default_config_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/config.html#default_config_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.config.default_config_params" title="Permalink to this definition"></a></dt>
+<dd><p>Dumps a dict object containing all default parameters in proper type format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Dictionary of config file values</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.config.dump_default_config_file">
+<span class="sig-name descname"><span class="pre">dump_default_config_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/config.html#dump_default_config_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.config.dump_default_config_file" title="Permalink to this definition"></a></dt>
+<dd><p>Dumps a default configuration file with all necessary parameters in the directory</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>directory</strong> (<em>str</em><em>, </em><em>optional</em>) – Directory to write file to, defaults to local directory.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.config.dump_default_config_file_koe">
+<span class="sig-name descname"><span class="pre">dump_default_config_file_koe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/config.html#dump_default_config_file_koe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.config.dump_default_config_file_koe" title="Permalink to this definition"></a></dt>
+<dd><p>Dumps a default configuration file with all necessary parameters for using the KOE extraction pipeline.
+Args:</p>
+<blockquote>
+<div><p>directory: Directory to write file to. OPTIONAL.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.config.load_config_file">
+<span class="sig-name descname"><span class="pre">load_config_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/config.html#load_config_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.config.load_config_file" title="Permalink to this definition"></a></dt>
+<dd><p>Loads in a config file for GalPrime to run</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – Filename (can be absolute or relative path, or a URL) to read config file from.</p></li>
+<li><p><strong>verbose_test</strong> (<em>bool</em><em>, </em><em>optional</em>) – If true, will create a helpful printout of params to ensure that the parameters are
+loading in properly.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Configuration file as a dict object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.config.load_config_file_koe">
+<span class="sig-name descname"><span class="pre">load_config_file_koe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/config.html#load_config_file_koe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.config.load_config_file_koe" title="Permalink to this definition"></a></dt>
+<dd><p>Loads in a config file for KOE to run</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>filename: Filename (can be absolute or relative path, or a URL) to read config file from.</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: Configuration file as a dict object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.config.print_config">
+<span class="sig-name descname"><span class="pre">print_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/config.html#print_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.config.print_config" title="Permalink to this definition"></a></dt>
+<dd><p>Print out the configuration file values</p>
+</dd></dl>
+
+</section>
+<section id="module-galprime.data">
+<span id="data-handling-data"></span><h2>Data Handling (data)<a class="headerlink" href="#module-galprime.data" title="Permalink to this heading"></a></h2>
+<p>Classes and methods for handling astronomical data</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="galprime.data.CutoutList">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CutoutList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cutouts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutout_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/data.html#CutoutList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.data.CutoutList" title="Permalink to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="galprime.data.CutoutList.cutouts_to_file">
+<span class="sig-name descname"><span class="pre">cutouts_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cutouts.fits'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/data.html#CutoutList.cutouts_to_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.data.CutoutList.cutouts_to_file" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="galprime.data.CutoutList.update_medatada">
+<span class="sig-name descname"><span class="pre">update_medatada</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/data.html#CutoutList.update_medatada"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.data.CutoutList.update_medatada" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.data.cutouts_from_file">
+<span class="sig-name descname"><span class="pre">cutouts_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/data.html#cutouts_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.data.cutouts_from_file" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.data.dict_extend">
+<span class="sig-name descname"><span class="pre">dict_extend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'_1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/data.html#dict_extend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.data.dict_extend" title="Permalink to this definition"></a></dt>
+<dd><p>Adds an extension onto the dict keys for a given input dictionary.
+Helpful when needing to add multiple dicts to a given metadata file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d</strong> (<em>dict</em>) – An input dictionary</p></li>
+<li><p><strong>extension</strong> (<em>str</em><em>, </em><em>optional</em>) – The extension to add to each key, defaults to “_1”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary with added extensions onto each key</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.data.gen_backgrounds">
+<span class="sig-name descname"><span class="pre">gen_backgrounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/data.html#gen_backgrounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.data.gen_backgrounds" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.data.gen_cutouts">
+<span class="sig-name descname"><span class="pre">gen_cutouts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_bar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/data.html#gen_cutouts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.data.gen_cutouts" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.data.gen_filestructure">
+<span class="sig-name descname"><span class="pre">gen_filestructure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outdir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/data.html#gen_filestructure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.data.gen_filestructure" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.data.gen_index_prefix">
+<span class="sig-name descname"><span class="pre">gen_index_prefix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bin_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/data.html#gen_index_prefix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.data.gen_index_prefix" title="Permalink to this definition"></a></dt>
+<dd><p>Go through the available bin parameters and generate a docstring that corresponds with
+an index-adjusted version of the other prefix (easier for plotting).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bin_params</strong> (<em>_type_</em>) – _description_</p></li>
+<li><p><strong>config</strong> (<em>_type_</em>) – _description_</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>_type_</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.data.gen_out_prefix">
+<span class="sig-name descname"><span class="pre">gen_out_prefix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bin_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/data.html#gen_out_prefix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.data.gen_out_prefix" title="Permalink to this definition"></a></dt>
+<dd><p>Generates a custom string based on the bin params</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>bin_params</strong> (<em>_type_</em>) – _description_</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>_type_</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.data.get_angular_size_dist">
+<span class="sig-name descname"><span class="pre">get_angular_size_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">H0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">71</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">WM</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.27</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/data.html#get_angular_size_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.data.get_angular_size_dist" title="Permalink to this definition"></a></dt>
+<dd><p>Return the angular size distance in Megaparsecs.
+(Stripped down version of Cosmocalc by Ned Wright and Tom Aldcroft (<a class="reference external" href="mailto:aldcroft&#37;&#52;&#48;head&#46;cfa&#46;harvard&#46;edu">aldcroft<span>&#64;</span>head<span>&#46;</span>cfa<span>&#46;</span>harvard<span>&#46;</span>edu</a>))</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z</strong> (<em>float</em>) – The redshift.</p></li>
+<li><p><strong>H0</strong> (<em>float</em><em>, </em><em>optional</em>) – The Hubble constant, defaults to 71 km/s/Mpc</p></li>
+<li><p><strong>WM</strong> (<em>float</em><em>, </em><em>optional</em>) – matter density parameter, defaults to 0.27</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.data.get_closest_psf">
+<span class="sig-name descname"><span class="pre">get_closest_psf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">psfs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'DEC'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/data.html#get_closest_psf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.data.get_closest_psf" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.data.get_image_filenames">
+<span class="sig-name descname"><span class="pre">get_image_filenames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images_directory</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/data.html#get_image_filenames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.data.get_image_filenames" title="Permalink to this definition"></a></dt>
+<dd><p>Retrieves a list of all available filenames for a given directory, and a given band.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>images_directory</strong> (<em>str</em>) – The top-level directory from which to get image filenames from.</p></li>
+<li><p><strong>image_band</strong> (<em>str</em><em>, </em><em>optional</em>) – The image band, defaults to “i”</p></li>
+<li><p><strong>check_band</strong> (<em>bool</em><em>, </em><em>optional</em>) – Check to make sure the images are of a certain band, defaults to False.
+WARNING: Optimized for HSC filename format (ex: HSC-I_9813_4c3.fits).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.data.get_wcs">
+<span class="sig-name descname"><span class="pre">get_wcs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fits_filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/data.html#get_wcs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.data.get_wcs" title="Permalink to this definition"></a></dt>
+<dd><p>Finds and returns the WCS for an image. If Primary Header WCS no good, searches each index until a good one
+is found. If none found, raises a ValueError</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fits_filename</strong> (<em>str</em>) – The filename for the FITS file.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The WCS object.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p>ValueError</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.data.good_isolist_names">
+<span class="sig-name descname"><span class="pre">good_isolist_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/data.html#good_isolist_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.data.good_isolist_names" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.data.ordered_dict">
+<span class="sig-name descname"><span class="pre">ordered_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/data.html#ordered_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.data.ordered_dict" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.data.table_from_isolist">
+<span class="sig-name descname"><span class="pre">table_from_isolist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">isolist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hdu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/data.html#table_from_isolist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.data.table_from_isolist" title="Permalink to this definition"></a></dt>
+<dd><p>Generates an astropy table</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>isolist</strong> (<em>photutils.isophote.isophotelist</em>) – The photutils.isophote.isophotelist object</p></li>
+<li><p><strong>names</strong> (<em>list</em><em>, </em><em>optional</em>) – Column names, defaults to galprime.good_isolist_names()</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The table generated from the isolist</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>astropy.table.Table</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.data.to_sb">
+<span class="sig-name descname"><span class="pre">to_sb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">27</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arcconv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.168</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/data.html#to_sb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.data.to_sb" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="determining-cutout-density-densities">
+<h2>Determining Cutout Density (densities)<a class="headerlink" href="#determining-cutout-density-densities" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-galprime.extraction">
+<span id="d-surface-brightness-profile-extraction-extraction"></span><h2>1D Surface Brightness Profile Extraction (extraction)<a class="headerlink" href="#module-galprime.extraction" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.extraction.isophote_fitting">
+<span class="sig-name descname"><span class="pre">isophote_fitting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">centre_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/extraction.html#isophote_fitting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.extraction.isophote_fitting" title="Permalink to this definition"></a></dt>
+<dd><p>Wrapper for photutils.isophote methods</p>
+<p>Generates a table of results from isophote fitting analysis. This uses photutils Isophote procedure, which is
+effectively IRAF’s Ellipse() method.
+Iterates over many possible input ellipses to force a higher success rate.</p>
+<dl>
+<dt>Args:</dt><dd><p>data: The input cutout
+config: The configuration parameters, which contains details like STEP and LINEAR for profile extraction.
+centre_method: Which method to use to determine where to place the centre of the first ellipse.</p>
+<blockquote>
+<div><p>‘standard’: place at the exact centre of the cutout
+‘max’: place at the maximum pixel in the cutout</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>The table of results, or an empty list if not fitted successfully.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-galprime.koe">
+<span id="automated-profile-extraction-with-koe-koe"></span><h2>Automated Profile Extraction with Koe (koe)<a class="headerlink" href="#module-galprime.koe" title="Permalink to this heading"></a></h2>
+<p>This module contains the methods required to run KOE, which is a tool designed to automatically extract profiles
+from a directory of images, with a given input catalogue.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.koe.koe_pipeline">
+<span class="sig-name descname"><span class="pre">koe_pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/koe.html#koe_pipeline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.koe.koe_pipeline" title="Permalink to this definition"></a></dt>
+<dd><p>The entire KOE pipeline configured to work with TBriDGE methods.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.koe.process_object">
+<span class="sig-name descname"><span class="pre">process_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_wcs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/koe.html#process_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.koe.process_object" title="Permalink to this definition"></a></dt>
+<dd><p>Process a single object, from the whole image to the final profile, for a given location.</p>
+</dd></dl>
+
+</section>
+<section id="module-galprime.masking">
+<span id="cutout-masking-masking"></span><h2>Cutout Masking (masking)<a class="headerlink" href="#module-galprime.masking" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="galprime.masking.MaskedCutout">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MaskedCutout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cutout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">masked_cutout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_array</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/masking.html#MaskedCutout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.masking.MaskedCutout" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="galprime.masking.MaskedCutout.apply_mask">
+<span class="sig-name descname"><span class="pre">apply_mask</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/masking.html#MaskedCutout.apply_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.masking.MaskedCutout.apply_mask" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="galprime.masking.MaskedCutout.gen_mask">
+<span class="sig-name descname"><span class="pre">gen_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gauss_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npixels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omit_centre</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deblend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/masking.html#MaskedCutout.gen_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.masking.MaskedCutout.gen_mask" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="galprime.masking.MaskedCutout.mask_cutout">
+<span class="sig-name descname"><span class="pre">mask_cutout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gauss_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npixels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omit_centre</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deblend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/masking.html#MaskedCutout.mask_cutout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.masking.MaskedCutout.mask_cutout" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-galprime.medians">
+<span id="medians-and-bootstrapping-medians"></span><h2>Medians and Bootstrapping (medians)<a class="headerlink" href="#module-galprime.medians" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.medians.array2D_median">
+<span class="sig-name descname"><span class="pre">array2D_median</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array2D</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/medians.html#array2D_median"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.medians.array2D_median" title="Permalink to this definition"></a></dt>
+<dd><p>Get the median of a 2D array of profiles (used in bootstrap_median())</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.medians.boostrap_median">
+<span class="sig-name descname"><span class="pre">boostrap_median</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/medians.html#boostrap_median"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.medians.boostrap_median" title="Permalink to this definition"></a></dt>
+<dd><p>Generate an Astropy Table object containing the values from bootstrapping of a set of profiles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>table_list</strong> (<em>list</em><em>(</em><em>Table</em><em>(</em><em>)</em><em>)</em>) – A set of tables (outputs from galprime.isophote_fitting, processed using the to_table() 
+method).</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of bootstrap iterations to run, defaults to 500</p></li>
+<li><p><strong>x_step</strong> (<em>float</em><em>, </em><em>optional</em>) – The step between samples along the x-axis, defaults to 0.5</p></li>
+<li><p><strong>plot_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – Directory to generate output plots where if None, no plots are made, defaults to None</p></li>
+<li><p><strong>plot_prefix</strong> (<em>str</em><em>, </em><em>optional</em>) – Prefix to include in the output plots. This is helpful if you have a 
+bin and want to include which bin the plots are coming from, defaults to “”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The table of</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>astropy Table object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.medians.interp_median">
+<span class="sig-name descname"><span class="pre">interp_median</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interp_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/medians.html#interp_median"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.medians.interp_median" title="Permalink to this definition"></a></dt>
+<dd><p>Get the median for a list of interp1D object profiles</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xs</strong> (<em>array_like</em>) – The x slices to get the median at</p></li>
+<li><p><strong>interp_list</strong> (<em>list</em><em>(</em><em>scipy.interp1D</em><em>)</em>) – The list of interp1D objects (individual profiles)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A 1D interpolation of the median profile.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>scipy.interpolate.interp1D</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.medians.max_sma">
+<span class="sig-name descname"><span class="pre">max_sma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sma_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sma'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/medians.html#max_sma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.medians.max_sma" title="Permalink to this definition"></a></dt>
+<dd><p>Get the maximum semimajor axis for a table list</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>table_list</strong> (<em>_type_</em>) – _description_</p></li>
+<li><p><strong>sma_key</strong> (<em>str</em><em>, </em><em>optional</em>) – _description_, defaults to “sma”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>_type_</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-galprime.modelling">
+<span id="d-galaxy-modelling-modelling"></span><h2>2D Galaxy Modelling (modelling)<a class="headerlink" href="#module-galprime.modelling" title="Permalink to this heading"></a></h2>
+<p>Scripts for generating galaxy models</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.modelling.b">
+<span class="sig-name descname"><span class="pre">b</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/modelling.html#b"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.modelling.b" title="Permalink to this definition"></a></dt>
+<dd><p>Get the b_n normalization constant for the sersic profile. 
+From Graham and Driver.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.modelling.check_sersic_params">
+<span class="sig-name descname"><span class="pre">check_sersic_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i_r50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_r50_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/modelling.html#check_sersic_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.modelling.check_sersic_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.modelling.gen_sersic_model">
+<span class="sig-name descname"><span class="pre">gen_sersic_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i_R50</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_eff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ellip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arc_conv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(51,</span> <span class="pre">51)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/modelling.html#gen_sersic_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.modelling.gen_sersic_model" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.modelling.i_at_r50">
+<span class="sig-name descname"><span class="pre">i_at_r50</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_50</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">27</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/modelling.html#i_at_r50"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.modelling.i_at_r50" title="Permalink to this definition"></a></dt>
+<dd><p>Get the intensity at the half-light radius</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.modelling.model_from_kde">
+<span class="sig-name descname"><span class="pre">model_from_kde</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kde</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag_kde</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/modelling.html#model_from_kde"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.modelling.model_from_kde" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.modelling.object_kde">
+<span class="sig-name descname"><span class="pre">object_kde</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">columns</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/modelling.html#object_kde"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.modelling.object_kde" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-galprime.profiles">
+<span id="d-surface-brightness-profile-handling-profiles"></span><h2>1D Surface Brightness Profile Handling (profiles)<a class="headerlink" href="#module-galprime.profiles" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-galprime.sims">
+<span id="galprime-simulation-routines-sims"></span><h2>GalPRIME Simulation Routines (sims)<a class="headerlink" href="#module-galprime.sims" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="galprime.sims.GPrime">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GPrime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psfs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backgrounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag_kde</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/sims.html#GPrime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.sims.GPrime" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class to create and run GalPrime simulations</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="galprime.sims.GPrime.load_bins">
+<span class="sig-name descname"><span class="pre">load_bins</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/sims.html#GPrime.load_bins"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.sims.GPrime.load_bins" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="galprime.sims.GPrime.pipeline">
+<span class="sig-name descname"><span class="pre">pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag_kde</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_bar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['ID',</span> <span class="pre">'IMG',</span> <span class="pre">'X',</span> <span class="pre">'Y',</span> <span class="pre">'RA',</span> <span class="pre">'DEC',</span> <span class="pre">'MAGS',</span> <span class="pre">'R50S',</span> <span class="pre">'NS',</span> <span class="pre">'ELLIPS',</span> <span class="pre">'MASS_MED',</span> <span class="pre">'ZPHOT',</span> <span class="pre">'sfProb',</span> <span class="pre">'I_R50',</span> <span class="pre">'PA',</span> <span class="pre">'R50_PIX',</span> <span class="pre">'BG_MEAN',</span> <span class="pre">'BG_MED',</span> <span class="pre">'BG_STD',</span> <span class="pre">'NSEG_BGA',</span> <span class="pre">'CENT_BGA',</span> <span class="pre">'N_MASKED_BGA',</span> <span class="pre">'P_MASKED_BGA',</span> <span class="pre">'NSEG_BGSUB',</span> <span class="pre">'CENT_BGSUB',</span> <span class="pre">'N_MASKED_BGSUB',</span> <span class="pre">'P_MASKED_BGSUB']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/sims.html#GPrime.pipeline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.sims.GPrime.pipeline" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="galprime.sims.GalPrimeError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GalPrimeError</span></span><a class="reference internal" href="_modules/galprime/sims.html#GalPrimeError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.sims.GalPrimeError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galprime.sims.gprime_single">
+<span class="sig-name descname"><span class="pre">gprime_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gprime_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_bin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kde</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/galprime/sims.html#gprime_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#galprime.sims.gprime_single" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="GalPRIME" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="galprime.plotting.html" class="btn btn-neutral float-right" title="GalPRIME Plotting Methods" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Harrison Souchereau.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

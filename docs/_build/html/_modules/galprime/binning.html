@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>galprime.binning &mdash; GalPRIME  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> GalPRIME
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../galprime.html">GalPRIME Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../galprime.plotting.html">GalPRIME Plotting Methods</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GalPRIME</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">galprime.binning</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for galprime.binning</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot; Binning methods</span>
+
+<span class="sd">This module contains all necessary methods for binning catalogues according to various parameters.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Table</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+
+<div class="viewcode-block" id="BinList"><a class="viewcode-back" href="../../galprime.html#galprime.binning.BinList">[docs]</a><span class="k">class</span> <span class="nc">BinList</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">        Container class for bins</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">bins</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">bins</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span> <span class="o">==</span> <span class="n">Bin</span><span class="p">:</span>
+            <span class="n">bins</span> <span class="o">=</span> <span class="p">[</span><span class="n">bins</span><span class="p">]</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">bins</span> <span class="o">=</span> <span class="n">bins</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_objects</span> <span class="o">=</span> <span class="mi">4</span>
+    
+<div class="viewcode-block" id="BinList.rebin"><a class="viewcode-back" href="../../galprime.html#galprime.binning.BinList.rebin">[docs]</a>    <span class="k">def</span> <span class="nf">rebin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">bounds</span><span class="p">):</span>
+        <span class="n">new_bins</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bins</span><span class="p">:</span>            
+            <span class="n">new_bins</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">rebin</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">bounds</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bins</span> <span class="o">=</span> <span class="n">new_bins</span></div></div>
+        
+<div class="viewcode-block" id="Bin"><a class="viewcode-back" href="../../galprime.html#galprime.binning.Bin">[docs]</a><span class="k">class</span> <span class="nc">Bin</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Class for a single bin of information</span>
+<span class="sd">        :param objects: The catalog rows that belong to the given bin</span>
+<span class="sd">        :type bin_param_names: array_like</span>
+<span class="sd">        :param object_column_names: The column names when the objects are sorted column-wise instead of row-wise.</span>
+<span class="sd">        :type bin_param_names: array_like</span>
+<span class="sd">        :param bin_params (arr): The values that define the bounds of the bin.</span>
+<span class="sd">        :type bin_param_names: array_like</span>
+<span class="sd">        :param bin_param_names (arr): Array of parameter names that the bin was made with.</span>
+<span class="sd">        :type bin_param_names: array_like</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objects</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">object_column_names</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">bin_params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">bin_params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">bin_params</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">objects</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">objects</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">objects</span> <span class="o">=</span> <span class="n">objects</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">object_column_names</span> <span class="o">=</span> <span class="n">object_column_names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bin_params</span> <span class="o">=</span> <span class="n">bin_params</span>
+        
+    
+<div class="viewcode-block" id="Bin.rebin"><a class="viewcode-back" href="../../galprime.html#galprime.binning.Bin.rebin">[docs]</a>    <span class="k">def</span> <span class="nf">rebin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">bounds</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Rebin a bin according to a set of bounds and a </span>
+<span class="sd">            given index</span>
+<span class="sd">            </span>
+<span class="sd">            index: the column index to bin by</span>
+<span class="sd">            bounds: The bounds to place the objects in </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Create new bins</span>
+        <span class="n">current_bin_params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bin_params</span><span class="p">)</span>
+        <span class="n">outbins</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Generate bins with the new proper bin parameters</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">this_bin</span> <span class="o">=</span> <span class="n">Bin</span><span class="p">(</span><span class="n">object_column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">object_column_names</span><span class="p">,</span> 
+                           <span class="n">bin_params</span><span class="o">=</span><span class="n">current_bin_params</span><span class="p">)</span>
+            <span class="n">this_bin</span><span class="o">.</span><span class="n">bin_params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_bin</span><span class="o">.</span><span class="n">bin_params</span><span class="p">,</span> 
+                                            <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="mi">2</span><span class="p">),</span> 
+                                             <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">2</span><span class="p">)])</span>
+            <span class="n">outbins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_bin</span><span class="p">)</span>
+            
+        <span class="n">bin_column</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">objects</span><span class="p">)[</span><span class="n">index</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bin_column</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">bounds</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">bin_column</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">bounds</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">outbins</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">objects</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">outbins</span></div>
+    
+<div class="viewcode-block" id="Bin.columns"><a class="viewcode-back" href="../../galprime.html#galprime.binning.Bin.columns">[docs]</a>    <span class="k">def</span> <span class="nf">columns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">objects</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="Bin.param_dict"><a class="viewcode-back" href="../../galprime.html#galprime.binning.Bin.param_dict">[docs]</a>    <span class="k">def</span> <span class="nf">param_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">param_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">object_column_names</span><span class="p">)):</span>
+            <span class="n">param_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">object_column_names</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">param_dict</span></div>
+    
+<div class="viewcode-block" id="Bin.file_prefix"><a class="viewcode-back" href="../../galprime.html#galprime.binning.Bin.file_prefix">[docs]</a>    <span class="k">def</span> <span class="nf">file_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;bin_&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bin_params</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">prefix</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bin_params</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">prefix</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bin_params</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span>
+        <span class="k">return</span> <span class="n">prefix</span></div>
+    
+<div class="viewcode-block" id="Bin.to_table"><a class="viewcode-back" href="../../galprime.html#galprime.binning.Bin.to_table">[docs]</a>    <span class="k">def</span> <span class="nf">to_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Creates a astropy.table.Table object for the objects and names contained</span>
+<span class="sd">        within the bin.</span>
+
+<span class="sd">        :param filename: Filename for saving, defaults to None</span>
+<span class="sd">        :type filename: str, optional</span>
+<span class="sd">        :param overwrite: Overwrite filename to save, defaults to False</span>
+<span class="sd">        :type overwrite: bool, optional</span>
+<span class="sd">        :return: Table of data parameters and associated </span>
+<span class="sd">        :rtype: astropy.table.Table()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">()</span>
+        <span class="n">t_out</span> <span class="o">=</span> <span class="n">Table</span><span class="p">()</span>
+        <span class="c1"># Add each column (and associated name) to the table</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">object_column_names</span><span class="p">):</span>
+            <span class="n">t_out</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        
+        <span class="c1"># If supplied with a filename, write the Table to a fits table </span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">t_out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;fits&#39;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">t_out</span></div></div>
+
+    
+<div class="viewcode-block" id="bin_catalog"><a class="viewcode-back" href="../../galprime.html#galprime.binning.bin_catalog">[docs]</a><span class="k">def</span> <span class="nf">bin_catalog</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Bin the inputted catalog.</span>
+
+<span class="sd">    This is a convenience function to get a list of bins based on redshift, star-formation, and mass.</span>
+
+<span class="sd">    :param config: Values from input config file or user inputs.</span>
+<span class="sd">    :type config: dict</span>
+<span class="sd">    :return: List of bins that have been binned according to the config settings.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">catalog</span> <span class="o">=</span> <span class="n">Table</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;CATALOG&quot;</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;fits&#39;</span><span class="p">)</span>
+    
+    <span class="n">mags</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">catalog</span><span class="p">[</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;MAG_KEY&quot;</span><span class="p">]])</span>
+    <span class="n">r50s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">catalog</span><span class="p">[</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;R50_KEY&quot;</span><span class="p">]])</span>
+    <span class="n">ns</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">catalog</span><span class="p">[</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;N_KEY&quot;</span><span class="p">]])</span>
+    <span class="n">ellips</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">catalog</span><span class="p">[</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ELLIP_KEY&quot;</span><span class="p">]])</span>
+
+    <span class="n">catalog_objects</span> <span class="o">=</span> <span class="p">[</span><span class="n">mags</span><span class="p">,</span> <span class="n">r50s</span><span class="p">,</span> <span class="n">ns</span><span class="p">,</span> <span class="n">ellips</span><span class="p">]</span>
+    <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;MAGS&quot;</span><span class="p">,</span> <span class="s2">&quot;R50S&quot;</span><span class="p">,</span> <span class="s2">&quot;NS&quot;</span><span class="p">,</span> <span class="s2">&quot;ELLIPS&quot;</span><span class="p">]</span>
+    <span class="n">bin_bounds</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="c1"># Add our bin stuff in</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;BIN_NAMES&quot;</span><span class="p">])):</span>
+        <span class="n">catalog_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">catalog</span><span class="p">[</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;BIN_NAMES&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]]))</span>
+        <span class="n">column_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;BIN_NAMES&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">bin_bounds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;BIN_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)])</span>
+        
+    <span class="n">rebin_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;BIN_NAMES&quot;</span><span class="p">]))</span>
+    <span class="n">catalog_objects</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">catalog_objects</span><span class="p">))</span>
+    
+    <span class="c1"># Create our initial bin</span>
+    <span class="n">init_bin</span> <span class="o">=</span> <span class="n">Bin</span><span class="p">(</span><span class="n">objects</span><span class="o">=</span><span class="n">catalog_objects</span><span class="p">,</span> <span class="n">object_column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">)</span>
+
+    <span class="n">binlist</span> <span class="o">=</span> <span class="n">BinList</span><span class="p">(</span><span class="n">bins</span><span class="o">=</span><span class="p">[</span><span class="n">init_bin</span><span class="p">])</span>
+    
+    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;BIN_NAMES&quot;</span><span class="p">])):</span>
+        <span class="n">binlist</span><span class="o">.</span><span class="n">rebin</span><span class="p">(</span><span class="n">index</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;BIN_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)])</span>
+    
+<span class="c1">#     check = binlist.rebin(4, config[&quot;BIN_0&quot;])</span>
+    
+<span class="c1">#     print(&quot;Binning by mass finished&quot;, &quot;\n&quot;)</span>
+<span class="c1">#     check = binlist.rebin(5, config[&quot;BIN_1&quot;])</span>
+
+    <span class="k">return</span> <span class="n">binlist</span></div>
+
+
+<div class="viewcode-block" id="plot_bin_params"><a class="viewcode-back" href="../../galprime.html#galprime.binning.plot_bin_params">[docs]</a><span class="k">def</span> <span class="nf">plot_bin_params</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Generate a nice plot of a bin&#39;s structural parameters</span>
+
+<span class="sd">    :param b: Input bin</span>
+<span class="sd">    :type b: Bin</span>
+<span class="sd">    :param columns: Number of columns per row, defaults to 4</span>
+<span class="sd">    :type columns: int, optional</span>
+<span class="sd">    :param filename: Output filename, defaults to None</span>
+<span class="sd">        If none, plt.show() is run instead</span>
+<span class="sd">    :type filename: str, optional</span>
+<span class="sd">    :param dpi: DPI for saved image, defaults to 150</span>
+<span class="sd">    :type dpi: int, optional</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">data</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">param_dict</span><span class="p">()</span>
+    <span class="n">data_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">/</span> <span class="n">columns</span><span class="p">))</span>
+    
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span><span class="n">columns</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">set_figwidth</span><span class="p">(</span><span class="n">columns</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">set_figheight</span><span class="p">(</span><span class="n">rows</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span>
+    
+    <span class="n">row</span><span class="p">,</span> <span class="n">column</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rows</span> <span class="o">*</span> <span class="n">columns</span><span class="p">):</span>
+        <span class="n">row</span><span class="p">,</span> <span class="n">column</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="n">columns</span><span class="p">)),</span> <span class="n">i</span> <span class="o">%</span> <span class="n">columns</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_names</span><span class="p">):</span>
+            <span class="n">ax</span><span class="p">[</span><span class="n">row</span><span class="p">][</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+            <span class="k">continue</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">data_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">row</span><span class="p">][</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+                            <span class="n">bins</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">row</span><span class="p">][</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Bin Size&quot;</span><span class="p">)</span>
+    
+    <span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Bin: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">bin_params</span><span class="p">),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Harrison Souchereau.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

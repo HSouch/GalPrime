@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>galprime.plotting.matrix_plot &mdash; GalPRIME  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> GalPRIME
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../galprime.html">GalPRIME Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../galprime.plotting.html">GalPRIME Plotting Methods</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">GalPRIME</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">galprime.plotting.matrix_plot</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for galprime.plotting.matrix_plot</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
+<span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Table</span>
+
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">interp1d</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">copy</span><span class="p">,</span> <span class="n">log10</span><span class="p">,</span> <span class="n">isnan</span><span class="p">,</span> <span class="n">isinf</span><span class="p">,</span> <span class="nb">round</span>
+
+
+<div class="viewcode-block" id="matrix_plot"><a class="viewcode-back" href="../../../galprime.plotting.html#galprime.plotting.matrix_plot.matrix_plot">[docs]</a><span class="k">def</span> <span class="nf">matrix_plot</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">x_bins</span><span class="p">,</span> <span class="n">y_bins</span><span class="p">,</span>
+                <span class="n">stubs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;bare&quot;</span><span class="p">,</span> <span class="s2">&quot;bgadded&quot;</span><span class="p">,</span> <span class="s2">&quot;noisy&quot;</span><span class="p">,</span> <span class="s2">&quot;bgsub&quot;</span><span class="p">],</span>
+                <span class="n">colours</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="s2">&quot;violet&quot;</span><span class="p">],</span> <span class="n">extra_params</span><span class="o">=</span><span class="s2">&quot;_0.0-0.5&quot;</span><span class="p">):</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">x_bins</span><span class="p">,</span> <span class="n">y_bins</span><span class="p">)</span>
+
+    <span class="n">n_x</span><span class="p">,</span> <span class="n">n_y</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x_bins</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_bins</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">n_x</span><span class="p">,</span> <span class="n">n_y</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">set_figheight</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">set_figwidth</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">stub</span> <span class="ow">in</span> <span class="n">stubs</span><span class="p">:</span>
+        <span class="n">filename_prefix</span> <span class="o">=</span> <span class="n">directory</span> <span class="o">+</span> <span class="n">stub</span> <span class="o">+</span> <span class="s2">&quot;_profiles/&quot;</span>
+
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_x</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_y</span><span class="p">):</span>
+                <span class="c1"># ax[x][y].text(0.5, 0.5, str(round(x_bins[n_x - x - 1], 2)) + &quot;,&quot; + str(round(y_bins[y], 2)),</span>
+                <span class="c1">#               color=&quot;red&quot;)</span>
+                <span class="k">pass</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="load_median_info"><a class="viewcode-back" href="../../../galprime.plotting.html#galprime.plotting.matrix_plot.load_median_info">[docs]</a><span class="k">def</span> <span class="nf">load_median_info</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="n">bare_hdul</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">bare_median</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="n">Table</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">bare_hdul</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">Table</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">bare_hdul</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="n">Table</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">bare_hdul</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+    <span class="n">bare_median_adj</span> <span class="o">=</span> <span class="n">adjust_profile</span><span class="p">(</span><span class="n">bare_median</span><span class="p">[</span><span class="s2">&quot;SMA&quot;</span><span class="p">],</span> <span class="n">bare_median</span><span class="p">[</span><span class="s2">&quot;INTENS&quot;</span><span class="p">])</span>
+    <span class="n">bare_l_1sig_adj</span> <span class="o">=</span> <span class="n">adjust_profile</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="s2">&quot;SMA&quot;</span><span class="p">],</span> <span class="n">l</span><span class="p">[</span><span class="s2">&quot;INTENS_1SIG&quot;</span><span class="p">])</span>
+    <span class="n">bare_u_1sig_adj</span> <span class="o">=</span> <span class="n">adjust_profile</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="s2">&quot;SMA&quot;</span><span class="p">],</span> <span class="n">u</span><span class="p">[</span><span class="s2">&quot;INTENS_1SIG&quot;</span><span class="p">])</span>
+    <span class="n">bare_l_2sig_adj</span> <span class="o">=</span> <span class="n">adjust_profile</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="s2">&quot;SMA&quot;</span><span class="p">],</span> <span class="n">l</span><span class="p">[</span><span class="s2">&quot;INTENS_2SIG&quot;</span><span class="p">])</span>
+    <span class="n">bare_u_2sig_adj</span> <span class="o">=</span> <span class="n">adjust_profile</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="s2">&quot;SMA&quot;</span><span class="p">],</span> <span class="n">u</span><span class="p">[</span><span class="s2">&quot;INTENS_2SIG&quot;</span><span class="p">])</span>
+    <span class="n">bare_l_3sig_adj</span> <span class="o">=</span> <span class="n">adjust_profile</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="s2">&quot;SMA&quot;</span><span class="p">],</span> <span class="n">l</span><span class="p">[</span><span class="s2">&quot;INTENS_3SIG&quot;</span><span class="p">])</span>
+    <span class="n">bare_u_3sig_adj</span> <span class="o">=</span> <span class="n">adjust_profile</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="s2">&quot;SMA&quot;</span><span class="p">],</span> <span class="n">u</span><span class="p">[</span><span class="s2">&quot;INTENS_3SIG&quot;</span><span class="p">])</span>
+    <span class="n">bare_l_5sig_adj</span> <span class="o">=</span> <span class="n">adjust_profile</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="s2">&quot;SMA&quot;</span><span class="p">],</span> <span class="n">l</span><span class="p">[</span><span class="s2">&quot;INTENS_5SIG&quot;</span><span class="p">])</span>
+    <span class="n">bare_u_5sig_adj</span> <span class="o">=</span> <span class="n">adjust_profile</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="s2">&quot;SMA&quot;</span><span class="p">],</span> <span class="n">u</span><span class="p">[</span><span class="s2">&quot;INTENS_5SIG&quot;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="adjust_profile"><a class="viewcode-back" href="../../../galprime.plotting.html#galprime.plotting.matrix_plot.adjust_profile">[docs]</a><span class="k">def</span> <span class="nf">adjust_profile</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">clean</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">shift</span><span class="o">=</span><span class="mf">0.00</span><span class="p">):</span>
+    <span class="c1"># hlr_index, hlr_value = get_half_light_radius(x, y)</span>
+    <span class="n">x_new</span><span class="p">,</span> <span class="n">y_new</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">copy</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">y_new</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.5</span> <span class="o">*</span> <span class="n">log10</span><span class="p">((</span><span class="n">y</span> <span class="o">+</span> <span class="n">shift</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">0.168</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">+</span> <span class="mi">27</span>
+
+    <span class="k">if</span> <span class="n">clean</span><span class="p">:</span>
+        <span class="n">x_clean</span><span class="p">,</span> <span class="n">y_clean</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x_new</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">isnan</span><span class="p">(</span><span class="n">y_new</span><span class="p">[</span><span class="n">n</span><span class="p">])</span> <span class="ow">or</span> <span class="n">isinf</span><span class="p">(</span><span class="n">y_new</span><span class="p">[</span><span class="n">n</span><span class="p">]):</span>
+                <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">x_clean</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_new</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+                <span class="n">y_clean</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_new</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+        <span class="n">profile_adj</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">x_clean</span><span class="p">,</span> <span class="n">y_clean</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">y_clean</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">x_new</span><span class="p">,</span> <span class="n">profile_adj</span><span class="p">(</span><span class="n">x_new</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">x_new</span><span class="p">,</span> <span class="n">y_new</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Harrison Souchereau.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
