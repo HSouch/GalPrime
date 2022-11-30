@@ -1,7 +1,7 @@
 import sys
 from galprime.isophote_l import Ellipse, EllipseGeometry
 from numpy import max, pi, log, unravel_index, argmax, ceil
-from photutils import data_properties
+from photutils.morphology import data_properties
 from tqdm import tqdm
 
 
