@@ -2,7 +2,6 @@ import sys
 from galprime.isophote_l import Ellipse, EllipseGeometry
 from numpy import max, pi, log, unravel_index, argmax, ceil
 from photutils.morphology import data_properties
-from tqdm import tqdm
 
 
 def isophote_fitting(data, config=None, centre_method='standard'):
@@ -34,8 +33,11 @@ def isophote_fitting(data, config=None, centre_method='standard'):
     else:
         centre = (data.shape[0] / 2, data.shape[1] / 2)
 
+    # Here we can just extract out to the requested size if specified in the cutout
     cutout_halfwidth = max((ceil(data.shape[0] / 2), ceil(data.shape[1] / 2)))
-
+    if config is not None:
+        cutout_halfwidth = config["EXTRACTION_SIZE"] / 2
+    
     fitting_list = []
 
     # First, try obtaining morphological properties from the data and fit using that starting ellipse
@@ -50,7 +52,7 @@ def isophote_fitting(data, config=None, centre_method='standard'):
         geometry = EllipseGeometry(pos[0], pos[1], sma=a, eps=(1 - (b / a)), pa=theta)
         flux = Ellipse(data, geometry)
         fitting_list = flux.fit_image(maxit=100, maxsma=cutout_halfwidth, step=step, linear=linear,
-                                      maxrit=cutout_halfwidth / 3)
+                                      maxrit=cutout_halfwidth / 2)
         if len(fitting_list) > 0:
             return fitting_list
 
