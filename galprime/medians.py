@@ -1,7 +1,6 @@
 import os
 import numpy as np
 from scipy.interpolate import interp1d
-from tqdm import tqdm
 
 from matplotlib import pyplot as plt
 
