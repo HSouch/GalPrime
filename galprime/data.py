@@ -2,6 +2,7 @@
 
 import math
 import os
+import pickle
 
 from astropy.io import fits
 from astropy.table import Table
@@ -12,8 +13,6 @@ from pathlib import Path
 import numpy as np
 
 import galprime
-
-from tqdm import tqdm
 
 
 class CutoutList:
@@ -119,14 +118,6 @@ def get_wcs(fits_filename):
     raise ValueError
 
 
-def gen_backgrounds(image_directory, config=None):
-    n_cutouts = 10 if config is None else config["N_BACKGROUNDS"]
-    
-    image_files = get_image_filenames(image_directory)
-
-    print(image_directory, image_files, n_cutouts)
-
-
 def get_angular_size_dist(z, H0=71, WM=0.27):
     """
     Return the angular size distance in Megaparsecs.
@@ -191,25 +182,6 @@ def get_angular_size_dist(z, H0=71, WM=0.27):
         raise ValueError
 
 
-def get_image_filenames(images_directory):
-    """
-    Retrieves a list of all available filenames for a given directory, and a given band.
-
-    :param images_directory: The top-level directory from which to get image filenames from.
-    :type images_directory: str
-    :param image_band: The image band, defaults to "i"
-    :type image_band: str, optional
-    :param check_band: Check to make sure the images are of a certain band, defaults to False.
-        WARNING: Optimized for HSC filename format (ex: HSC-I_9813_4c3.fits).
-    :type check_band: bool, optional
-    """
-    image_filenames = []
-    images = Path(images_directory).rglob('*.fits')
-    for image in images:
-        image_filenames.append(str(image))
-    return image_filenames
-
-
 def gen_cutouts(image_directory, config=None, buffer=10, progress_bar=False):
     n_cutouts = 10 if config is None else config["N_BACKGROUNDS"]
     cutout_size = 71 if config is None else config["SIZE"]
@@ -221,8 +193,7 @@ def gen_cutouts(image_directory, config=None, buffer=10, progress_bar=False):
     image_files = get_image_filenames(image_directory)
     
     cutouts, cutout_data = [], []
-    iterator = tqdm(range(n_cutouts), desc="Making Image Cutouts: ") if progress_bar else range(n_cutouts)
-    for i in iterator:
+    for i in range(n_cutouts):
         this_fn = np.random.choice(image_files)
         
         with fits.open(this_fn) as HDUList:
@@ -341,13 +312,70 @@ def gen_index_prefix(bin_params, config):
 
 def gen_filestructure(outdir):
 
+    if not os.path.isdir(outdir):
+        os.mkdir(outdir)
+
     for d in ["bare_profiles/", "bgadded_profiles/", "bgsub_profiles/", "additional_info/",
               "bare_medians/", "bgadded_medians/", "bgsub_medians/"]:
         os.makedirs(outdir + d, exist_ok=True)
+    
+    file_dict = {"BARE_PROFILES": outdir + "bare_profiles/",
+                 "BGADDED_PROFILES": outdir + "bgadded_profiles/",
+                 "BGSUB_PROFILES": outdir + "bgsub_profiles/",
+                 "BARE_MEDIANS": outdir + "bare_medians/",
+                 "BGADDED_MEDIANS": outdir + "bgadded_medians/",
+                 "BGSUB_MEDIANS": outdir + "bgsub_medians/",
+                 "ADDITIONAL": outdir + "additional_info/"}
+    return file_dict
+
+
+def construct_table_row(gprime_container, names):
+    """Return an individual row for an output table
+
+    :param gprime_container: The galprime container to draw metadata from.
+    :type gprime_container: galprime.GalprimeContainer
+    :param names: The column names to draw from (must be identical to what is saved in metadata).
+    :type names: array_like
+    :return: A row containing the relevant parameters.
+    :rtype: array_like
+    """
+    meta = gprime_container.metadata
+
+    row = [meta[n] for n in names]
+    return row
+
+
+def construct_infotable(container_list, names):
+    """ Generate an astropy Table with all the relevant data neatly saved. 
+
+    :param container_list: A list of galprime GalPrimeContainer objects
+    :type container_list: array_like(GalPrimeContainer)
+    :param names: The column names to draw from (must be identical to what is saved in metadata).
+    :type names: array_like
+    :return: The output table, with column names identical to names
+    :rtype: astropy.table.Table
+    """
+    rows = []
+
+    for container in container_list:
+        rows.append(construct_table_row(container, names))
+    
+    t_out = Table(rows=rows, names=names)
+
+    return t_out
 
 
 def to_sb(y, m_0=27, arcconv=0.168):
     y_new = -2.5 * np.log10(y / (arcconv ** 2)) + m_0
     return y_new
 
-    
+
+def save_pickle(out_object, filename):
+    with open(filename, 'wb') as handle:
+        pickle.dump(out_object, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+def load_pickle(filename):
+    with open(filename, 'rb') as handle:
+        out_object = pickle.load(handle)
+    return out_object
