@@ -1,4 +1,5 @@
 import os
+import time
 import galprime
 from astropy.io import fits
 from astropy.visualization import ZScaleInterval
@@ -192,6 +193,7 @@ class GalPrimeContainer:
         
 
     def process_object(self, plot=False):
+        t_init = time.time()
         self.generate_model()
         self.get_background()
         self.subtract_background()
@@ -199,6 +201,8 @@ class GalPrimeContainer:
         self.extract_profiles()
         self.save_data()
         
+        self.metadata["T_ELPSD"] = time.time() - t_init
+
         if plot:
             outdir = self.config["OUT_DIR"] + "pngs/"
             if not os.path.isdir(outdir):
