@@ -21,8 +21,7 @@ setup(
     url='https://github.com/HSouch/GalPRIME',
     keywords='galaxies surface brightness profiles',
     scripts=[
-        # "bin/koe.py",
-        # "bin/GalPRIME.py"
+        "bin/GPRIME"
     ],
     install_requires=[
         'scikit-image',
