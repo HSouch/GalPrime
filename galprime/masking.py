@@ -30,11 +30,11 @@ class MaskedCutout:
         
         # First get our segment array (deblended or not)
         threshold = detect_threshold(self.cutout, nsigma=nsigma)
-        segments = detect_sources(self.cutout, threshold, npixels=npixels, filter_kernel=kernel)
+        segments = detect_sources(self.cutout, threshold, npixels=npixels, kernel=kernel)
         
         if deblend:
             try:
-                segments = deblend_sources(self.cutout, segments, npixels=npixels, filter_kernel=kernel)
+                segments = deblend_sources(self.cutout, segments, npixels=npixels, kernel=kernel, progress_bar=False)
             except ImportError:
                 print("Skimage not working!")
         
