@@ -13,6 +13,7 @@ from scipy.signal import convolve2d
 import galprime
 
 from pebble import ProcessPool
+# from multiprocessing import Pool, TimeoutError
 from concurrent.futures import TimeoutError
 
 
@@ -81,56 +82,27 @@ class GPrime():
             kde = galprime.object_kde(columns)
             galprime.save_pickle(kde, directories["ADDITIONAL"] + index_prefix + "_kde.dat")
 
-
+ 
             # Set up the job pool
             job_list, job_results = [], []
             if verbose:
                 print("Working through", self.config["N_MODELS"], "models for bin:", current_bin.bin_params, 
                       "with", self.config["CORES"], "cores." )
             
-            # with ProcessPool(max_workers=self.config["CORES"]) as pool:
-            #     for i in range(self.config["N_MODELS"]):
-            #         job_list.append(pool.schedule(process_method,
-            #                                     args=(self, current_bin, kde),
-            #                                     timeout=self.config["TIME_LIMIT"]))
-            # # Now get all the results
-            # for i, job in enumerate(job_list):
-            #     try:
-            #         job_results.append(job.result())
-            #     except Exception as error:
-            #         print(" ", error.args, i)
+            generate_container_pickles(self, current_bin, kde, directories, mag_kde=mag_kde)
 
-            def task_done(future):
-                try:
-                    result = future.result()  # blocks until results are ready
-                    job_results.append(result)
-                except TimeoutError as error:
-                    print("Function took longer than %d seconds" % error.args[1])
-                except Exception as error:
-                    print("Function raised %s" % error)
-                    if debug:
-                        print(error.traceback)  # traceback of the function
+            pickle_filenames = galprime.get_image_filenames(directories["TEMP"], modifier='*.gpobj')
+            print(pickle_filenames)
+
+            return pickle_filenames
+            
+
+            # for f in os.listdir(directories["TEMP"]):
+            #     os.remove(f)
 
 
-            with ProcessPool(max_workers=self.config["CORES"]) as pool:
-                for index in range(self.config["N_MODELS"]):
-                    future = pool.schedule(process_method, args=(self, current_bin, kde),
-                                           timeout=self.config["TIME_LIMIT"])
-                    future.add_done_callback(task_done)
-
-
-            # Clean the jobs of any that just so happened to fail and return junk profiles
-            cleaned_containers = []
-            for container in job_results:
-                good = True
-                for prof in (container.model_profile, container.bgadded_profile, container.bgsub_profile):
-                    if len(prof) == 0:
-                        good = False
-                        break
-                if good:
-                    cleaned_containers.append(container)
-            print(" . Profiles cleaned", len(job_results), len(cleaned_containers))
-            job_results = cleaned_containers
+            # Clean all of the containers (remove any with crappy 0-length fit results)
+            job_results = clean_containers(job_results)
             
 
             # Now save all of the data into nice outputs
@@ -174,12 +146,62 @@ class GPrime():
             except Exception as error:
                 print(" . Error with saving the output table (compare metadata with table_names):", error.args)
 
+
             if verbose:
                 print("Finished. Time elapsed:", np.round((time.time() - t_init) / 60, 3), "minutes.")
+            
 
             # ONLY in debugging, you can return the GalPrimeContainer list for the first bin.
             if debug:
                 return job_list
+
+
+def clean_containers(container_list):
+    cleaned_containers = []
+    for container in container_list:
+        good = True
+        for prof in (container.model_profile, container.bgadded_profile, container.bgsub_profile):
+            if len(prof) == 0:
+                good = False
+                break
+        if good:
+            cleaned_containers.append(container)
+    print(" . Profiles cleaned", len(job_results), len(cleaned_containers))
+    return cleaned_containers
+
+
+def generate_container_pickles(gprime_obj, current_bin, kde, directories, mag_kde=None):
+     for i in range(gprime_obj.config["N_MODELS"]):
+        metadata = {}
+        metadata["NAMES"] = current_bin.object_column_names
+        metadata["BIN_PARAMS"] = current_bin.bin_params
+
+        # Select a background and add the background info to the metadata
+        bg_index = randint(len(gprime_obj.backgrounds.cutouts))
+        metadata["BG_INDEX"] = bg_index
+        metadata.update(gprime_obj.backgrounds.cutout_data[bg_index])
+
+        # Get the best PSF is the user has supplied PSFs to the pipeline
+        # Otherwise, just use a simple Gaussian2D kernel from astropy
+        if gprime_obj.psfs is None:
+            psf = Gaussian2DKernel(x_stddev=1.5, y_stddev=1.5)
+        else:
+            psf = galprime.get_closest_psf(gprime_obj.psfs, metadata["RA"], metadata["DEC"])
+
+        # Generate our container
+        container = galprime.GalPrimeContainer(config=gprime_obj.config, kde=kde, mag_kde=mag_kde, psf=np.copy(psf),
+                                        background_cutout=np.copy(gprime_obj.backgrounds.cutouts[bg_index]), 
+                                        metadata=metadata)
+
+        galprime.save_pickle(container, directories["TEMP"] + "container_" + str(i) + ".gpobj")
+
+
+def loadobj(object_filename):
+    print("Cleaning", object_filename)
+    container = galprime.load_pickle(object_filename)
+    container.process_object(plot=False)
+    return container 
+
 
 def gprime_single(gprime_obj, current_bin, kde):
     metadata = {}
@@ -204,3 +226,5 @@ def gprime_single(gprime_obj, current_bin, kde):
                                     metadata=metadata)
     container.process_object(plot=False)
     return container
+
+
