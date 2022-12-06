@@ -59,7 +59,7 @@ class CutoutList:
 
 
 
-def get_image_filenames(images_directory):
+def get_image_filenames(images_directory, modifier='*.fits'):
     """
     Retrieves a list of all available filenames for a given directory, and a given band.
 
@@ -72,10 +72,12 @@ def get_image_filenames(images_directory):
     :type check_band: bool, optional
     """
     image_filenames = []
-    images = Path(images_directory).rglob('*.fits')
+    images = Path(images_directory).rglob(modifier)
     for image in images:
         image_filenames.append(str(image))
     return image_filenames
+
+
 
 
 def get_closest_psf(psfs, ra, dec, ra_key="RA", dec_key="DEC"):
@@ -316,7 +318,7 @@ def gen_filestructure(outdir):
         os.mkdir(outdir)
 
     for d in ["bare_profiles/", "bgadded_profiles/", "bgsub_profiles/", "additional_info/",
-              "bare_medians/", "bgadded_medians/", "bgsub_medians/"]:
+              "bare_medians/", "bgadded_medians/", "bgsub_medians/", "tempfiles/"]:
         os.makedirs(outdir + d, exist_ok=True)
     
     file_dict = {"BARE_PROFILES": outdir + "bare_profiles/",
@@ -325,7 +327,8 @@ def gen_filestructure(outdir):
                  "BARE_MEDIANS": outdir + "bare_medians/",
                  "BGADDED_MEDIANS": outdir + "bgadded_medians/",
                  "BGSUB_MEDIANS": outdir + "bgsub_medians/",
-                 "ADDITIONAL": outdir + "additional_info/"}
+                 "ADDITIONAL": outdir + "additional_info/",
+                 "TEMP": outdir + "tempfiles/"}
     return file_dict
 
 
