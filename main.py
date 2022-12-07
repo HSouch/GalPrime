@@ -4,7 +4,7 @@ from astropy.table import Table
 from numpy.random import normal
 
 config = galprime.load_config_file('../newconfig.galprime')
-
+mag_table = "../COSMOS_V9_MAGS.fits"
 # galprime.print_config(config)
 # sys.exit()
 

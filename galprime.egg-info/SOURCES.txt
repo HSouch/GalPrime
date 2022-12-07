@@ -1,6 +1,7 @@
 LICENSE
 README.md
 setup.py
+bin/GPRIME
 galprime/GalPrimeContainer.py
 galprime/__init__.py
 galprime/backgrounds.py
@@ -12,6 +13,7 @@ galprime/koe.py
 galprime/masking.py
 galprime/medians.py
 galprime/modelling.py
+galprime/profiles.py
 galprime/sims.py
 galprime.egg-info/PKG-INFO
 galprime.egg-info/SOURCES.txt
