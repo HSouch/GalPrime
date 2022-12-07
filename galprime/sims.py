@@ -2,7 +2,6 @@ import galprime
 import numpy as np
 import os, time
 
-from matplotlib import pyplot as plt
 
 from astropy.io import fits
 from astropy.convolution import Gaussian2DKernel
@@ -12,9 +11,11 @@ from scipy.signal import convolve2d
 
 import galprime
 
-from pebble import ProcessPool
+from pebble import ProcessPool, ProcessExpired
 # from multiprocessing import Pool, TimeoutError
 from concurrent.futures import TimeoutError
+
+from tqdm import tqdm
 
 
 class GalPrimeError(Exception):
@@ -91,20 +92,49 @@ class GPrime():
             
             generate_container_pickles(self, current_bin, kde, directories, mag_kde=mag_kde)
 
+            # We save everything to pickles to ensure no weird ram issues in multiprocessing.
             pickle_filenames = galprime.get_image_filenames(directories["TEMP"], modifier='*.gpobj')
-            print(pickle_filenames)
 
-            return pickle_filenames
-            
+            # Set up our iterator. This can either be a progress bar or             
+            if progress_bar:
+                iterator = tqdm(desc="Bin: " + index_prefix, total=len(pickle_filenames))
+            else:
+                iterator = 0
 
-            # for f in os.listdir(directories["TEMP"]):
-            #     os.remove(f)
+            # Run our parallel threads over all of the gprime object pickles
+            with iterator as pbar:
+                with ProcessPool(max_workers=self.config["CORES"]) as pool:
 
+                    future = pool.map(loadobj, pickle_filenames, timeout=15)
+                    
+                    container = future.result()
+                    while True:
+                        try:
+                            result = next(container)
+                            job_results.append(result)
+                        except StopIteration:
+                            break
+                        except TimeoutError as error:
+                            print("Function timed out.")
+                        except ProcessExpired as error:
+                            print("%s. Exit code: %d" % (error, error.exitcode))
+                        except Exception as error:
+                            print("function raised %s" % error)
+                            print(error)  # Python's traceback of remote process
+                        finally:
+                            if progress_bar:
+                                pbar.update(1)
+                            else:
+                                iterator += 1
+                    
+
+            # Removing temporary files
+            for f in pickle_filenames:
+                os.remove(f)
 
             # Clean all of the containers (remove any with crappy 0-length fit results)
             job_results = clean_containers(job_results)
             
-
             # Now save all of the data into nice outputs
             bare_hdulist, bgadded_hdulist, bgsub_hdulist = fits.HDUList(), fits.HDUList(), fits.HDUList()
      
@@ -166,7 +196,7 @@ def clean_containers(container_list):
                 break
         if good:
             cleaned_containers.append(container)
-    print(" . Profiles cleaned", len(job_results), len(cleaned_containers))
+    print(" . Profiles cleaned", len(container_list), len(cleaned_containers))
     return cleaned_containers
 
 
@@ -197,9 +227,9 @@ def generate_container_pickles(gprime_obj, current_bin, kde, directories, mag_kd
 
 
 def loadobj(object_filename):
-    print("Cleaning", object_filename)
     container = galprime.load_pickle(object_filename)
     container.process_object(plot=False)
+    # return container.metadata
     return container 
 
 
