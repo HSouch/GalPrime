@@ -105,7 +105,7 @@ class GPrime():
             with iterator as pbar:
                 with ProcessPool(max_workers=self.config["CORES"]) as pool:
 
-                    future = pool.map(loadobj, pickle_filenames, timeout=15)
+                    future = pool.map(loadobj, pickle_filenames, timeout=self.config["TIME_LIMIT"])
                     
                     container = future.result()
                     while True:
